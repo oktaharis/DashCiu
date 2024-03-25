@@ -38,7 +38,7 @@ func ConnectDatabase(app string) {
 		return
 	}
 
-	fmt.Printf("Berhasil terhubung dengan database %s\n", app)
+	fmt.Printf("terhubung dengan database %s\n", app)
 	DBConnections[app] = conn
 }
 

@@ -6,11 +6,9 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/jeypc/homecontroller/controller/dashboardhandler"
-	"github.com/jeypc/homecontroller/models"
 )
 
 func main() {
-	models.ConnectDatabase("spl")
 	r := mux.NewRouter()
 
 	// Menggunakan variabel app dalam URL dan membiarkan page sebagai query parameter

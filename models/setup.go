@@ -38,8 +38,6 @@ func ConnectDatabase(app string) {
 		return
 	}
 
-	fmt.Printf("terhubung dengan database %s\n", app)
+	fmt.Printf("terhubung dengan database %s\n", dbDatabase)
 	DBConnections[app] = conn
 }
-
-

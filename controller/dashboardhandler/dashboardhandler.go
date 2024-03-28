@@ -26,7 +26,8 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	page := dashboardInput["page"]
 	app := dashboardInput["app"]
 	app_child := dashboardInput["app_child"]
-	// Pastikan parameter page valid, jika tidak, kembalikan error
+
+	//  parameter page valid, jika tidak, kembalikan error
 	if page != "production" && page != "claim" && page != "summary" {
 		http.Error(w, "Invalid page parameter", http.StatusBadRequest)
 		return
@@ -43,6 +44,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Koneksi ke database
 	db := models.DBConnections[app]
+	fmt.Println(db)
 	if db == nil {
 		models.ConnectDatabase(app)
 		db = models.DBConnections[app]
@@ -63,7 +65,8 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			periodParams = "'" + yearmonth + "'"
 		}
-
+		fmt.Println(yearmonthPtr)
+		query = ""
 		// KPI & Atome
 		if app == "kpi" || app == "afi" {
 			paramApp := app + "|" + app_child
@@ -71,12 +74,13 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 				paramApp = app
 			}
 			query = fmt.Sprintf("SELECT * FROM dashboard.sp_dashboard('admin', '%s', 'production', %s)", paramApp, periodParams)
+			fmt.Println(query)
 		} else {
-			query = "SELECT * FROM dashboard.sp_dashboard('admin', 'production', ?)"
+			query = fmt.Sprintf("SELECT * FROM dashboard.sp_dashboard('admin', 'production', %s)", periodParams)
 		}
 
 		// Eksekusi query
-		rows, err := db.Raw(query, yearmonthPtr).Rows()
+		rows, err := db.Raw(query).Rows()
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -106,9 +110,24 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		results = productionResults
 
 	case "claim":
-		query = "SELECT * FROM dashboard.sp_dashboard('admin', 'claim', ?)"
 		var claimResults []models.ClaimData
-		rows, err := db.Raw(query, yearmonthPtr).Rows()
+
+		fmt.Println(yearmonthPtr)
+		query = ""
+		// KPI & Atome
+		if app == "kpi" || app == "afi" {
+			paramApp := app + "|" + app_child
+			if app_child == "All" {
+				paramApp = app
+			}
+			query = fmt.Sprintf("SELECT * FROM dashboard.sp_dashboard('admin', '%s', 'production', '%s')", paramApp, *yearmonthPtr)
+		} else {
+			query = fmt.Sprintf("SELECT * FROM dashboard.sp_dashboard('admin', 'production', '%s')", *yearmonthPtr)
+		}
+
+		// Eksekusi query
+		rows, err := db.Raw(query).Rows()
+
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -156,9 +175,9 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 				paramApp = app
 			}
 			query = fmt.Sprintf("SELECT * FROM dashboard.sp_dashboard('admin', '%s', 'summary_production', %s)", paramApp, periodParams)
+			fmt.Println(query)
 		} else {
 			query = fmt.Sprintf("SELECT * FROM dashboard.sp_dashboard('admin', 'summary_production', %s)", periodParams)
-			fmt.Println(periodParams)
 		}
 
 		// Eksekusi query

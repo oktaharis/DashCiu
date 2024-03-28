@@ -49,13 +49,13 @@ type ClaimData struct {
 	UnclaimableTotal   int                      `json:"unclaimable_total"`
 	Claimable          int                      `json:"claimable"`
 	ClaimableTotal     int                      `json:"claimable_total"`
-	SubmittedAmount    int                      `json:"submitted_amount"`
+	SubmittedAmount    float64                  `json:"submitted_amount"`
 	Submitted          int                      `json:"submitted"`
 	SubmittedDate      string                   `json:"submitted_date"`
 	AcceptedAmount     int                      `json:"accepted_amount"`
 	Accepted           int                      `json:"accepted"`
 	AcceptedDate       string                   `json:"accepted_date"`
-	RejectedAmount     int                      `json:"rejected_amount"`
+	RejectedAmount     float64                  `json:"rejected_amount"`
 	Rejected           int                      `json:"rejected"`
 	RejectedDate       string                   `json:"rejected_date"`
 	InProcessAmount    int                      `json:"in_process_amount"`

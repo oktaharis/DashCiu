@@ -1,17 +1,16 @@
 package models
 
+// ini adalah stuktur dashboard
 type Period struct {
 	YearMonth string `json:"yearmonth"`
 	Label     string `json:"label"`
 }
-
 type CertificateByTenor struct {
 	Tenor        int     `json:"tenor"`
 	GrossPremium float64 `json:"gross_premium"`
 	TSI          float64 `json:"tsi"`
 	Certificate  int     `json:"certificate"`
 }
-
 type Gender struct {
 	Gender string  `json:"gender"`
 	Total  int     `json:"total"`

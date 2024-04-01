@@ -10,7 +10,7 @@ import (
 )
 
 // Import paket yang diperlukan
-func IndexHandler(w http.ResponseWriter, r *http.Request) {
+func IndexDash(w http.ResponseWriter, r *http.Request) {
 	// Dekode input JSON dari request body
 	var dashboardInput map[string]string
 	decoder := json.NewDecoder(r.Body)
@@ -168,7 +168,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 			periodParams = "'" + yearmonth + "_" + yearmonthend + "'"
 		}
 
-		// Buat query sesuai dengan kondisi aplikasi (kpi, afi, atau lainnya)
+		// Buat query sesuai dengan kondisi aplikasi (kpi, afi)
 		if app == "kpi" || app == "afi" {
 			paramApp := app + "|" + app_child
 			if app_child == "All" {

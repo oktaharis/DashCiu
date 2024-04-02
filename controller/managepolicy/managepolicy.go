@@ -34,6 +34,7 @@ func IndexPolicy(w http.ResponseWriter, r *http.Request) {
 		db = models.DBConnections[app]
 	}
 	fmt.Println(app)
+	
 	// Set kolom yang akan diambil dari tabel
 	var columns string
 	switch app {

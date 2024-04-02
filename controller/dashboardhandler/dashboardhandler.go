@@ -67,6 +67,7 @@ func IndexDash(w http.ResponseWriter, r *http.Request) {
 		}
 		fmt.Println(yearmonthPtr)
 		query = ""
+		
 		// KPI & Atome
 		if app == "kpi" || app == "afi" {
 			paramApp := app + "|" + app_child

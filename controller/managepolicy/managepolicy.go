@@ -210,7 +210,7 @@ func IndexPolicy(w http.ResponseWriter, r *http.Request) {
 	} else {
 		query += "1 = 1" // Tambahkan kondisi yang selalu benar jika tidak ada filter
 	}
-	fmt.Println("inifilters", filters)
+	fmt.Println("ini filters =", filters)
 
 	// Query untuk menghitung jumlah total baris yang sesuai dengan kueri
 	countQuery := "SELECT COUNT(*) FROM dashboard.policy WHERE "
@@ -300,24 +300,40 @@ func IndexPolicy(w http.ResponseWriter, r *http.Request) {
 
 		policies = append(policies, policy)
 	}
+// Inisialisasi variabel untuk menyimpan nilai yearmonth dari item pertama (jika tersedia)
+var itemYearMonth string
 
-	// Siapkan data untuk ditampilkan dalam format JSON
-	// Kirim respons JSON
-	helper.ResponseJSON(w, http.StatusOK, map[string]interface{}{
-		"items":       policies,
-		"perPage":     pageLength,
-		"currentPage": page,
-		"path":        r.URL.Path,
-		"query":       r.URL.Query(),
-		"fragment":    r.URL.Fragment,
-		"pageName":    "page",
-		"onEachSide":  3,
-		"options":     map[string]string{"path": r.URL.Path, "pageName": "page"},
-		"total":       totalCount,
-		"lastPage":    int(math.Ceil(float64(totalCount) / float64(pageLength))),
-		"status":      true,
-		"message":     "Berhasil mengambil data policy",
-	})
+// Pastikan ada setidaknya satu item dalam slice policies
+if len(policies) > 0 {
+    // Ambil yearmonth dari item pertama dalam slice policies
+    itemYearMonth = policies[0].YearMonth
+}
+
+// Siapkan data query
+queryParams := map[string]string{
+    "yearmonth": itemYearMonth,
+    "search":    search,
+    "length":    lengthStr,
+    "risk":      risk,
+}
+
+// Kirim respons JSON
+helper.ResponseJSON(w, http.StatusOK, map[string]interface{}{
+    "items":       policies,
+    "perPage":     pageLength,
+    "currentPage": page,
+    "path":        r.URL.Path,
+    "query":       queryParams,
+    "fragment":    r.URL.Fragment,
+    "pageName":    "page",
+    "onEachSide":  3,
+    "options":     map[string]string{"path": r.URL.Path, "pageName": "page"},
+    "total":       totalCount,
+    "lastPage":    int(math.Ceil(float64(totalCount) / float64(pageLength))),
+    "status":      true,
+    "message":     "Berhasil mengambil data policy",
+})
+
 }
 
 // Mengonversi format yearmonth dari "yyyymm" menjadi "Month YYYY"

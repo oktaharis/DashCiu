@@ -1,10 +1,14 @@
 package models
 
 // ini adalah stuktur dashboard
+// models/period.go
+
 type Period struct {
-	YearMonth string `json:"yearmonth"`
-	Label     string `json:"label"`
+    YearMonth string
+    Label     string
+    Selected  bool // Menambahkan field Selected ke dalam struct
 }
+
 type CertificateByTenor struct {
 	Tenor        int     `json:"tenor"`
 	GrossPremium float64 `json:"gross_premium"`

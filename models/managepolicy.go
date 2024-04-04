@@ -14,14 +14,14 @@ type PolicyData struct {
 	Remark                  interface{} `json:"remark"`
 	YearMonth               string      `json:"yearmonth"`
 	Risk                    bool        `json:"risk"`
-	NomorPolis              string      `json:"nomor_polis"`
+	NomorPolis              interface{} `json:"nomor_polis"`
 	KodeProduk              string      `json:"kode_produk"`
 	KantorCabang            string      `json:"kantor_cabang"`
 	NoRekening              string      `json:"no_rekening"`
 	Premi                   string      `json:"premi"`
 	MulaiAsuransi           string      `json:"mulai_asuransi"`
 	SelesaiAsuransi         string      `json:"selesai_asuransi"`
-	TanggalLahir            string      `json:"tanggal_lahir"`
+	TanggalLahir            interface{} `json:"tanggal_lahir"`
 	PremiRefund             string      `json:"premi_refund"`
 	Status                  string      `json:"status"`
 	RemarkRefund            string      `json:"remark_refund"`

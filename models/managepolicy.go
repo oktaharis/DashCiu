@@ -43,7 +43,7 @@ type PolicyData struct {
 	Premium                 string      `json:"premium"`  // Tambahkan field Premium
 }
 
-type Paginator struct {
+type PaginatorMan struct {
 	Items       []PolicyData           `json:"items"`
 	PerPage     int                    `json:"perPage"`
 	CurrentPage int                    `json:"currentPage"`

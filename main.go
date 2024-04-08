@@ -5,9 +5,10 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/jeypc/homecontroller/controller/manageclaim"
 	"github.com/jeypc/homecontroller/controller/dashboardhandler"
+	"github.com/jeypc/homecontroller/controller/manageclaim"
 	"github.com/jeypc/homecontroller/controller/managepolicy"
+	"github.com/jeypc/homecontroller/controller/subrogation"
 )
 
 func main() {
@@ -17,6 +18,7 @@ func main() {
 	r.HandleFunc("/dashboard", dashboardhandler.IndexDash).Methods("POST")
 	r.HandleFunc("/managepolicy", managepolicy.IndexPolicy).Methods("POST")
 	r.HandleFunc("/manageclaim", manageclaim.IndexClaim).Methods("POST")
+	r.HandleFunc("/subrogation", subrogation.IndexSub).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

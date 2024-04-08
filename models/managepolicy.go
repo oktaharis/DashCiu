@@ -43,17 +43,17 @@ type PolicyData struct {
 	Premium                 string      `json:"premium"`  // Tambahkan field Premium
 }
 
-type Paginator struct {
-	Items       []PolicyData           `json:"items"`
-	PerPage     int                    `json:"perPage"`
-	CurrentPage int                    `json:"currentPage"`
-	Path        string                 `json:"path"`
-	Query       map[string]string      `json:"query"`
-	Fragment    interface{}            `json:"fragment"`
-	PageName    string                 `json:"pageName"`
-	OnEachSide  int                    `json:"onEachSide"`
-	Options     map[string]interface{} `json:"options"`
-	Total       int                    `json:"total"`
-	LastPage    int                    `json:"lastPage"`
-	Periods     []Period               `json:"periods"`
-}
+// type Paginator struct {
+// 	Items       []PolicyData           `json:"items"`
+// 	PerPage     int                    `json:"perPage"`
+// 	CurrentPage int                    `json:"currentPage"`
+// 	Path        string                 `json:"path"`
+// 	Query       map[string]string      `json:"query"`
+// 	Fragment    interface{}            `json:"fragment"`
+// 	PageName    string                 `json:"pageName"`
+// 	OnEachSide  int                    `json:"onEachSide"`
+// 	Options     map[string]interface{} `json:"options"`
+// 	Total       int                    `json:"total"`
+// 	LastPage    int                    `json:"lastPage"`
+// 	Periods     []Period               `json:"periods"`
+// }

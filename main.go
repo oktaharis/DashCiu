@@ -9,6 +9,7 @@ import (
 	"github.com/jeypc/homecontroller/controller/manageclaim"
 	"github.com/jeypc/homecontroller/controller/managepolicy"
 	"github.com/jeypc/homecontroller/controller/subrogation"
+	"github.com/jeypc/homecontroller/controller/explore"
 )
 
 func main() {
@@ -19,6 +20,7 @@ func main() {
 	r.HandleFunc("/managepolicy", managepolicy.IndexPolicy).Methods("POST")
 	r.HandleFunc("/manageclaim", manageclaim.IndexClaim).Methods("POST")
 	r.HandleFunc("/subrogation", subrogation.IndexSub).Methods("POST")
+	r.HandleFunc("/explore", explore.IndexExplore).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

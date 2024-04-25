@@ -10,6 +10,8 @@ import (
 	"github.com/jeypc/homecontroller/controller/managepolicy"
 	"github.com/jeypc/homecontroller/controller/subrogation"
 	"github.com/jeypc/homecontroller/controller/explore"
+	"github.com/jeypc/homecontroller/controller/filesredines"
+
 )
 
 func main() {
@@ -21,6 +23,8 @@ func main() {
 	r.HandleFunc("/manageclaim", manageclaim.IndexClaim).Methods("POST")
 	r.HandleFunc("/subrogation", subrogation.IndexSub).Methods("POST")
 	r.HandleFunc("/explore", explore.IndexExplore).Methods("POST")
+	r.HandleFunc("/filesredines", filesredines.IndexFiles).Methods("POST")
+
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

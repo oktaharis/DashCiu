@@ -22,11 +22,11 @@ func ConnectDatabase(app string) {
 	}
 
 	// Mendapatkan nilai variabel koneksi database
-	dbHost := os.Getenv("DB_HOST_" + app)
-	dbPort := os.Getenv("DB_PORT_" + app)
-	dbDatabase := os.Getenv("DB_DATABASE_" + app)
-	dbUsername := os.Getenv("DB_USERNAME_" + app)
-	dbPassword := os.Getenv("DB_PASSWORD_" + app)
+	dbHost := os.Getenv("DB_HOST_SPL")
+	dbPort := os.Getenv("DB_PORT_SPL")
+	dbDatabase := os.Getenv("DB_DATABASE_SPL")
+	dbUsername := os.Getenv("DB_USERNAME_SPL")
+	dbPassword := os.Getenv("DB_PASSWORD_SPL")
 
 	connStr := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
 		dbHost, dbUsername, dbPassword, dbDatabase, dbPort)

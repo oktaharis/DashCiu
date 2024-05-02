@@ -18,12 +18,12 @@ func main() {
 
 	// Menggunakan variabel app dalam URL dan membiarkan page sebagai query parameter
 	
-	r.HandleFunc("/explorespl", explore.ExploreSpl).Methods("POST")
-	r.HandleFunc("/filesredinesspl", filesredines.FilesSpl).Methods("POST")
-	r.HandleFunc("/manageclaimspl", manageclaim.ClaimSpl).Methods("POST")
-	r.HandleFunc("/managepolicyspl", managepolicyspl.PolicySpl).Methods("POST")
+	r.HandleFunc("/explorespl", explore.ExploreSpl).Methods("GET")
+	r.HandleFunc("/filesredinesspl", filesredines.FilesSpl).Methods("GET")
+	r.HandleFunc("/manageclaimspl", manageclaim.ClaimSpl).Methods("GET")
+	r.HandleFunc("/managepolicyspl", managepolicyspl.PolicySpl).Methods("GET")
 	r.HandleFunc("/dashboardspl", dashboardhandler.IndexDashSpl).Methods("GET")
-	r.HandleFunc("/subrogationspl", subrogation.SubrogationSpl).Methods("POST")
+	r.HandleFunc("/subrogationspl", subrogation.SubrogationSpl).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

@@ -1,7 +1,6 @@
 package filesredines
 
 import (
-	"encoding/json"
 	"fmt"
 	"math"
 	"net/http"
@@ -14,21 +13,15 @@ import (
 )
 
 func FilesSpl(w http.ResponseWriter, r *http.Request) {
-	// Mendekode body request JSON
-	var requestBody map[string]string
-	err := json.NewDecoder(r.Body).Decode(&requestBody)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+	// Ambil nilai parameter dari URL
+	queryValues := r.URL.Query()
+	yearmonthStr := queryValues.Get("yearmonth")
 
-	// Mendapatkan nilai dari body request
-	app := "spl"
-	yearmonthStr := requestBody["yearmonth"]
-
+	// Konversi yearmonth menjadi integer
 	yearmonth, _ := strconv.Atoi(yearmonthStr)
 
 	// Koneksi ke database
+	app := "spl"
 	db := models.DBConnections[app]
 	if db == nil {
 		models.ConnectDatabase(app)
@@ -36,8 +29,7 @@ func FilesSpl(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Query untuk mendapatkan periode
-	var query string
-	query = "SELECT * FROM dashboard.sp_filter('admin', 'production|period');"
+	query := "SELECT * FROM dashboard.sp_filter('admin', 'production|period');"
 	fmt.Println(query)
 
 	var periods []models.Period
@@ -83,7 +75,7 @@ func FilesSpl(w http.ResponseWriter, r *http.Request) {
 	filters := []string{}
 
 	if yearmonth != 0 {
-		filters = append(filters, fmt.Sprintf("yearmonth = '%d'", yearmonth))
+		filters = append(filters, fmt.Sprintf("yearmonth = %d", yearmonth))
 	}
 
 	// Gabungkan semua filter
@@ -133,12 +125,12 @@ func FilesSpl(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var file models.FilesRedinesData
 		// Pindai nilai kolom ke dalam variabel struktur
-			if err := rows.Scan(&file.Yearmonth, &file.Label, &file.Policy, &file.Claim, &file.UpdatedAt, &file.IsProcess); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			// Mengubah format yearmonth menjadi "Month YYYY"
-			file.Yearmonth = convertYearmonth(file.Yearmonth)
+		if err := rows.Scan(&file.Yearmonth, &file.Label, &file.Policy, &file.Claim, &file.UpdatedAt, &file.IsProcess); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		// Mengubah format yearmonth menjadi "Month YYYY"
+		file.Yearmonth = convertYearmonth(file.Yearmonth)
 
 		files = append(files, file)
 	}
@@ -161,6 +153,7 @@ func FilesSpl(w http.ResponseWriter, r *http.Request) {
 		"message":     "Berhasil mengambil data files redines",
 	})
 }
+
 
 // Mengonversi format yearmonth dari "yyyymm" menjadi "Month YYYY"
 func convertYearmonth(yearMonthStr string) string {

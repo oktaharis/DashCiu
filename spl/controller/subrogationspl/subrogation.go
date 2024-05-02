@@ -1,7 +1,6 @@
 package subrogation
 
 import (
-	"encoding/json"
 	"fmt"
 	"math"
 	"net/http"
@@ -12,19 +11,12 @@ import (
 )
 
 func SubrogationSpl(w http.ResponseWriter, r *http.Request) {
-	var subrogationInput map[string]string
-	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&subrogationInput); err != nil {
-		response := map[string]interface{}{"message": err.Error(), "status": false}
-		helper.ResponseJSON(w, http.StatusBadRequest, response)
-		return
-	}
-
-	yearmonthStr := subrogationInput["yearmonth"]
-	app := "spl"
-	lengthStr := subrogationInput["length"]
-	search := subrogationInput["search"]
-	status := subrogationInput["status"]
+	// Ambil nilai parameter dari URL
+	subrogationInput := r.URL.Query()
+	yearmonthStr := subrogationInput.Get("yearmonth")
+	search := subrogationInput.Get("search")
+	status := subrogationInput.Get("status")
+	lengthStr := subrogationInput.Get("length")
 
 	// Jika lengthStr kosong, atur length ke nilai default 10
 	length := 10
@@ -39,11 +31,13 @@ func SubrogationSpl(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page := 1 // Halaman default
-	if pageStr := subrogationInput["page"]; pageStr != "" {
+	if pageStr := subrogationInput.Get("page"); pageStr != "" {
 		page, _ = strconv.Atoi(pageStr)
 	}
 
 	yearmonth, _ := strconv.Atoi(yearmonthStr)
+
+	app := "spl"
 
 	db := models.DBConnections[app]
 	if db == nil {
@@ -96,11 +90,6 @@ func SubrogationSpl(w http.ResponseWriter, r *http.Request) {
 
 	// Tambahkan limit dan offset ke dalam query
 	query = query.Select(column).Limit(length).Offset(offset)
-	// // Membuat variabel untuk menyimpan query SQL
-	// var sqlQuery string
-
-	// // Mendapatkan query SQL lengkap dengan pemilihan semua kolom
-	// query.Scan(&sqlQuery)
 
 	// Mencetak query SQL untuk debug
 	fmt.Println(query)
@@ -131,3 +120,4 @@ func SubrogationSpl(w http.ResponseWriter, r *http.Request) {
 
 	helper.ResponseJSON(w, http.StatusOK, response)
 }
+

@@ -1,7 +1,6 @@
 package manageclaim
 
 import (
-	"encoding/json"
 	"fmt"
 	"math"
 	"net/http"
@@ -14,35 +13,39 @@ import (
 )
 
 func ClaimSpl(w http.ResponseWriter, r *http.Request) {
-	// Mendekode body request JSON
-	var requestBody map[string]string
-	err := json.NewDecoder(r.Body).Decode(&requestBody)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+	// Ambil nilai parameter dari URL
+	queryValues := r.URL.Query()
+	yearmonthStr := queryValues.Get("yearmonth")
+	search := queryValues.Get("search")
+	remarks := queryValues.Get("remarks")
+	spl := queryValues.Get("spl")
+	lengthStr := queryValues.Get("length")
+
+	// Jika lengthStr kosong, atur length ke nilai default 10
+	length := 10
+	fmt.Println(length)
+	if lengthStr != "" {
+		var err error
+		length, err = strconv.Atoi(lengthStr)
+		if err != nil {
+			response := map[string]interface{}{"message": "Invalid length", "status": false}
+			helper.ResponseJSON(w, http.StatusBadRequest, response)
+			return
+		}
 	}
 
-	// Mendapatkan nilai dari body request
-	app := "spl"
-	lengthStr := requestBody["length"]
-	yearmonthStr := requestBody["yearmonth"]
-	search := requestBody["search"]
-	status := requestBody["status"]
-
-	// Konversi length dan yearmonth menjadi integer
-	length, _ := strconv.Atoi(lengthStr)
-	fmt.Println("pagination = ", length)
+	// Konversi yearmonth ke integer
 	yearmonth, _ := strconv.Atoi(yearmonthStr)
 
-	// Koneksi ke database
+	app := "spl"
+
 	db := models.DBConnections[app]
 	if db == nil {
 		models.ConnectDatabase(app)
 		db = models.DBConnections[app]
 	}
 
-	// Query untuk mendapatkan periode
-
+	// Query untuk mendapatkan periods
 	query := "SELECT * FROM dashboard.sp_filter('admin', 'production|period');"
 	fmt.Println(query)
 
@@ -107,12 +110,16 @@ func ClaimSpl(w http.ResponseWriter, r *http.Request) {
 		filters = append(filters, fmt.Sprintf("no_rekening = '%s'", search))
 	}
 
-	if status != ""{
-		filters = append(filters, fmt.Sprintf("status_claim = '%s'", status))
+	if remarks != "" {
+		filters = append(filters, fmt.Sprintf("remark = '%s'", remarks))
+	}
+
+	if spl != "" {
+		filters = append(filters, fmt.Sprintf("status_claim = '%s'", spl))
 	}
 
 	if yearmonth != 0 {
-		filters = append(filters, fmt.Sprintf("yearmonth = '%d'", yearmonth))
+		filters = append(filters, fmt.Sprintf("yearmonth = %d", yearmonth))
 	}
 
 	// Gabungkan semua filter
@@ -121,7 +128,7 @@ func ClaimSpl(w http.ResponseWriter, r *http.Request) {
 	} else {
 		query += "1 = 1" // Tambahkan kondisi yang selalu benar jika tidak ada filter
 	}
-	fmt.Println("inifilters", filters)
+	fmt.Println("filters:", filters)
 
 	// Query untuk menghitung jumlah total baris yang sesuai dengan kueri
 	countQuery := "SELECT COUNT(*) FROM dashboard.claim WHERE "
@@ -159,7 +166,7 @@ func ClaimSpl(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rows.Close()
 
-	fmt.Println(query)
+	fmt.Println("Query:", query)
 
 	// Iterasi setiap baris hasil query
 	var claims []models.ClaimListData
@@ -167,7 +174,7 @@ func ClaimSpl(w http.ResponseWriter, r *http.Request) {
 		var claim models.ClaimListData
 		// Pindai nilai kolom ke dalam variabel struktur
 		var nilaiKlaim float64
-		if err := rows.Scan(&claim.ClaimId, &claim.ProductKey, &claim.Premium, &claim.TanggalPengajuanKlaimBni, &claim.NoRekening, &claim.NoPerjanjianKredit, &claim.Nama, &claim.TglLahir, &claim.NoKtp, &claim.NilaiKreditDasar, &claim.NilaiKlaim, &claim.TglMulai, &claim.TglAkhir, &claim.Tenor, &claim.CreatedAt, &claim.UpdatedAt, &claim.Filename, &claim.StatusClaim, &claim.Remark, &claim.Yearmonth, &claim.Category); err != nil {
+		if err := rows.Scan(&claim.ClaimId, &claim.ProductKey, &claim.Premium, &claim.TanggalPengajuanKlaimBni, &claim.NoRekening, &claim.NoPerjanjianKredit, &claim.Nama, &claim.TglLahir, &claim.NoKtp, &claim.NilaiKreditDasar, &nilaiKlaim, &claim.TglMulai, &claim.TglAkhir, &claim.Tenor, &claim.CreatedAt, &claim.UpdatedAt, &claim.Filename, &claim.StatusClaim, &claim.Remark, &claim.Yearmonth, &claim.Category); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -192,11 +199,12 @@ func ClaimSpl(w http.ResponseWriter, r *http.Request) {
 		"onEachSide":  3,
 		"options":     map[string]string{"path": r.URL.Path, "pageName": "page"},
 		"total":       totalCount,
-		"lastPage":    int(math.Ceil(float64(totalCount) / float64(pageLength))),
+		 "lastPage":    int(math.Ceil(float64(totalCount) / float64(pageLength))),
 		"status":      true,
 		"message":     "Berhasil mengambil data claim",
 	})
 }
+
 
 // Mengonversi format yearmonth dari "yyyymm" menjadi "Month YYYY"
 func convertYearmonth(yearMonthStr string) string {

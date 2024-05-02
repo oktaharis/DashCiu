@@ -1,7 +1,6 @@
 package explore
 
 import (
-	"encoding/json"
 	"fmt"
 	"math"
 	"net/http"
@@ -14,30 +13,21 @@ import (
 )
 
 func ExploreSpl(w http.ResponseWriter, r *http.Request) {
-	// Mendekode body request JSON
-	var requestBody map[string]string
-	err := json.NewDecoder(r.Body).Decode(&requestBody)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	// Mendapatkan nilai dari body request
-	app := "spl"
-	policyYearmonth := requestBody["policy_yearmonth"]
-	claimYearmonth := requestBody["claim_yearmonth"]
-	nik := requestBody["nik"]
-	name := requestBody["name"]
-	noPk := requestBody["no_pk"]
-	lengthStr := requestBody["length"]
+	// Ambil nilai parameter dari URL
+	queryValues := r.URL.Query()
+	yearmonthStr := queryValues.Get("yearmonth")
+	nik := queryValues.Get("nik")
+	name := queryValues.Get("name")
+	noPk := queryValues.Get("no_pk")
+	lengthStr := queryValues.Get("length")
 
 	// Konversi length dan yearmonth menjadi integer
 	length, _ := strconv.Atoi(lengthStr)
 	fmt.Println("pagination = ", length)
-	polYearmonth, _ := strconv.Atoi(policyYearmonth)
-	claYearmonth, _ := strconv.Atoi(claimYearmonth)
+	yearmonth, _ := strconv.Atoi(yearmonthStr)
 
-	// Koneksi ke database
+	app := "spl"
+
 	db := models.DBConnections[app]
 	if db == nil {
 		models.ConnectDatabase(app)
@@ -45,9 +35,7 @@ func ExploreSpl(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Query untuk mendapatkan periode
-	var query string
-	
-	query = "SELECT * FROM dashboard.sp_filter('admin', 'production|period');"
+	query := "SELECT * FROM dashboard.sp_filter('admin', 'production|period');"
 	fmt.Println(query)
 
 	var periods []models.Period
@@ -68,11 +56,13 @@ func ExploreSpl(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Set parameter periode default jika tidak disediakan
-	if polYearmonth == 0 && len(periods) > 0 {
-		polYearmonth = 0
-	}
-	if claYearmonth == 0 && len(periods) > 0 {
-		claYearmonth = 0
+	if yearmonth == 0 && len(periods) > 0 {
+		yearmonthInt, err := strconv.Atoi(periods[len(periods)-1].YearMonth)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		yearmonth = yearmonthInt
 	}
 
 	columns := []string{
@@ -84,31 +74,27 @@ func ExploreSpl(w http.ResponseWriter, r *http.Request) {
 		"policy_yearmonth",
 		"ltc_by_nik",
 	}
-	
+
 	// Query untuk mendapatkan data explore
 	query = "SELECT " + strings.Join(columns, ", ") + " FROM dashboard.summary_explore WHERE "
-	 
+
 	// Buat filter berdasarkan parameter yang diberikan
 	filters := []string{}
 
-	if nik != ""{
+	if nik != "" {
 		filters = append(filters, fmt.Sprintf("nik = '%s'", nik))
 	}
 
-	if noPk != ""{
+	if noPk != "" {
 		filters = append(filters, fmt.Sprintf("no_pk = '%s'", noPk))
 	}
 
-	if name != ""{
+	if name != "" {
 		filters = append(filters, fmt.Sprintf("name = '%s'", name))
 	}
 
-	if polYearmonth != 0 {
-		filters = append(filters, fmt.Sprintf("policy_yearmonth = '%d'", polYearmonth))
-	}
-
-	if claYearmonth != 0 {
-		filters = append(filters, fmt.Sprintf("claim_yearmonth = '%d'", claYearmonth))
+	if yearmonth != 0 {
+		filters = append(filters, fmt.Sprintf("policy_yearmonth = %d", yearmonth))
 	}
 
 	// Gabungkan semua filter
@@ -117,7 +103,7 @@ func ExploreSpl(w http.ResponseWriter, r *http.Request) {
 	} else {
 		query += "1 = 1" // Tambahkan kondisi yang selalu benar jika tidak ada filter
 	}
-	fmt.Println("inifilters", filters)
+	fmt.Println("filters:", filters)
 
 	// Query untuk menghitung jumlah total baris yang sesuai dengan kueri
 	countQuery := "SELECT COUNT(*) FROM dashboard.summary_explore WHERE "
@@ -167,12 +153,12 @@ func ExploreSpl(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-	
+
 		explore.PolicyYearmonth = convertYearmonthPolicy(explore.PolicyYearmonth)
 		explore.ClaimYearmonth = convertYearmonthClaim(explore.ClaimYearmonth)
-		
+
 		explores = append(explores, explore)
-	  }
+	}
 
 	// Siapkan data untuk ditampilkan dalam format JSON
 	// Kirim respons JSON

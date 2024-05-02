@@ -25,21 +25,20 @@ type PolicyData struct {
 	URLSertifikat           interface{} `json:"url_sertifikat"`
 	YearMonth               string      `json:"yearmonth"`
 	Risk                    bool        `json:"risk"`
-	ExpiredDate             *string      `json:"expired_date"`
+	ExpiredDate             *string     `json:"expired_date"`
 }
 
-
 // type Paginator struct {
-// 	Items       []PolicyData           `json:"items"`
-// 	PerPage     int                    `json:"perPage"`
-// 	CurrentPage int                    `json:"currentPage"`
-// 	Path        string                 `json:"path"`
-// 	Query       map[string]string      `json:"query"`
-// 	Fragment    interface{}            `json:"fragment"`
-// 	PageName    string                 `json:"pageName"`
-// 	OnEachSide  int                    `json:"onEachSide"`
-// 	Options     map[string]interface{} `json:"options"`
-// 	Total       int                    `json:"total"`
-// 	LastPage    int                    `json:"lastPage"`
-// 	Periods     []Period               `json:"periods"`
+// 	Items       []PolicyData           json:"items"
+// 	PerPage     int                    json:"perPage"
+// 	CurrentPage int                    json:"currentPage"
+// 	Path        string                 json:"path"
+// 	Query       map[string]string      json:"query"
+// 	Fragment    interface{}            json:"fragment"
+// 	PageName    string                 json:"pageName"
+// 	OnEachSide  int                    json:"onEachSide"
+// 	Options     map[string]interface{} json:"options"
+// 	Total       int                    json:"total"
+// 	LastPage    int                    json:"lastPage"
+// 	Periods     []Period               json:"periods"
 // }

@@ -10,18 +10,20 @@ import (
 	"github.com/jeypc/homecontroller/controller/filesredinesspl"
 	"github.com/jeypc/homecontroller/controller/manageclaimspl"
 	managepolicyspl "github.com/jeypc/homecontroller/controller/managepolicy"
+	"github.com/jeypc/homecontroller/controller/subrogationspl"
 )
 
 func main() {
 	r := mux.NewRouter()
 
 	// Menggunakan variabel app dalam URL dan membiarkan page sebagai query parameter
-
+	
 	r.HandleFunc("/explorespl", explore.ExploreSpl).Methods("POST")
 	r.HandleFunc("/filesredinesspl", filesredines.FilesSpl).Methods("POST")
 	r.HandleFunc("/manageclaimspl", manageclaim.ClaimSpl).Methods("POST")
 	r.HandleFunc("/managepolicyspl", managepolicyspl.PolicySpl).Methods("POST")
 	r.HandleFunc("/dashboardspl", dashboardhandler.IndexDashSpl).Methods("GET")
+	r.HandleFunc("/subrogationspl", subrogation.SubrogationSpl).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

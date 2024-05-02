@@ -103,11 +103,11 @@ func ClaimSpl(w http.ResponseWriter, r *http.Request) {
 	// Buat filter berdasarkan parameter yang diberikan
 	filters := []string{}
 
-	if search != "" && app != "kpi" && app != "afi" {
+	if search != "" {
 		filters = append(filters, fmt.Sprintf("no_rekening = '%s'", search))
 	}
 
-	if status != "All Status" && app != "flexi" && app != "kpi" && app != "afi" {
+	if status != ""{
 		filters = append(filters, fmt.Sprintf("status_claim = '%s'", status))
 	}
 

@@ -10,7 +10,6 @@ import (
 	"github.com/jeypc/homecontroller/helper"
 	"github.com/jeypc/homecontroller/models"
 )
-
 func IndexMonuser(w http.ResponseWriter, r *http.Request) {
 	// Parse query parameters from URL
 	queryValues := r.URL.Query()

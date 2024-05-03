@@ -28,6 +28,14 @@ func ConnectDatabase(app string) {
 	dbUsername := os.Getenv("DB_USERNAME_SPL")
 	dbPassword := os.Getenv("DB_PASSWORD_SPL")
 
+	if app == "user_man" {
+		dbHost = os.Getenv("DB_HOST_USER")
+		dbPort = os.Getenv("DB_PORT_USER")
+		dbDatabase = os.Getenv("DB_DATABASE_USER")
+		dbUsername = os.Getenv("DB_USERNAME_USER")
+		dbPassword = os.Getenv("DB_PASSWORD_USER")
+	}
+
 	connStr := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
 		dbHost, dbUsername, dbPassword, dbDatabase, dbPort)
 

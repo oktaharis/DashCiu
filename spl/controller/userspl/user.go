@@ -36,27 +36,18 @@ func UserSpl(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var query string
-	rows, err := db.Raw(query).Rows()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer rows.Close()
 
 	// Query untuk mendapatkan data user
 	columns := []string{
 		"id", 
 		"name", 
 		"email",
-		"password", 
 		"phone", 
 		"status", 
 		"created_at", 
 		"updated_at", 
 		"role_id", 
-		"product_id", 
-		"otp", 
-		"expired_at",
+		"product_id",
 	}
 
 	// Query untuk mendapatkan data user
@@ -81,7 +72,7 @@ func UserSpl(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("inifilters", filters)
 
 	// Query untuk menghitung jumlah total baris yang sesuai dengan kueri
-	countQuery := "SELECT COUNT(*) FROM dashboard.user WHERE "
+	countQuery := "SELECT COUNT(*) FROM dashboard.users WHERE "
 	// Tambahkan klausa filter sesuai dengan kueri utama
 	if len(filters) > 0 {
 		countQuery += strings.Join(filters, " AND ")
@@ -105,7 +96,7 @@ func UserSpl(w http.ResponseWriter, r *http.Request) {
 	query += fmt.Sprintf(" LIMIT %d OFFSET %d", pageLength, offset)
 
 	// Eksekusi query
-	rows, err = db.Raw(query).Rows()
+	rows, err := db.Raw(query).Rows()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -119,7 +110,7 @@ func UserSpl(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var user models.UserData
 		// Pindai nilai kolom ke dalam variabel struktur
-			if err := rows.Scan(&user.Id, &user.Name, &user.Email, &user.Password, &user.Phone, &user.Status, &user.CreatedAt, &user.UpdatedAt,  &user.RoleId, &user.ProductId, &user.Otp, &user.ExpiredAt); err != nil {
+			if err := rows.Scan(&user.Id, &user.Name, &user.Email, &user.Phone, &user.Status, &user.CreatedAt, &user.UpdatedAt,  &user.RoleId, &user.ProductId); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}

@@ -43,7 +43,20 @@ func IndexSub(w http.ResponseWriter, r *http.Request) {
 		page, _ = strconv.Atoi(pageStr)
 	}
 
-	yearmonth, _ := strconv.Atoi(yearmonthStr)
+	// Inisialisasi yearmonth
+	var yearmonth int
+	if app == "flexi" && (yearmonthStr == "" || yearmonthStr == "null") {
+		// Jika app adalah "flexi" dan yearmonthStr kosong atau null, berikan nilai default 202403
+		yearmonth = 202403
+	} else if yearmonthStr != "" {
+		var err error
+		yearmonth, err = strconv.Atoi(yearmonthStr)
+		if err != nil {
+			response := map[string]interface{}{"message": "Invalid yearmonth", "status": false}
+			helper.ResponseJSON(w, http.StatusBadRequest, response)
+			return
+		}
+	}
 
 	db := models.DBConnections[app]
 	if db == nil {
@@ -108,12 +121,6 @@ func IndexSub(w http.ResponseWriter, r *http.Request) {
 
 	// Tambahkan limit dan offset ke dalam query
 	query = query.Select(column).Limit(length).Offset(offset)
-	// // Membuat variabel untuk menyimpan query SQL
-	// var sqlQuery string
-
-	// // Mendapatkan query SQL lengkap dengan pemilihan semua kolom
-	// query.Scan(&sqlQuery)
-
 	// Mencetak query SQL untuk debug
 	fmt.Println(query)
 

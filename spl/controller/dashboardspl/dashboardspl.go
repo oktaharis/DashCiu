@@ -31,7 +31,11 @@ func IndexDashSpl(w http.ResponseWriter, r *http.Request) {
 		var err error
 		length, err = strconv.Atoi(lengthStr)
 		if err != nil {
-			http.Error(w, "Invalid length parameter", http.StatusBadRequest)
+			responseData := map[string]interface{}{
+				"status":  false,
+				"message": "failed, invalid length",
+			}
+			helper.ResponseJSON(w, http.StatusOK, responseData)
 			return
 		}
 	}
@@ -210,7 +214,11 @@ func IndexDashSpl(w http.ResponseWriter, r *http.Request) {
 		results = resultsData
 
 	default:
-		http.Error(w, "Invalid page parameter", http.StatusBadRequest)
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, invalid parameter",
+		}
+		helper.ResponseJSON(w, http.StatusOK, responseData)
 		return
 	}
 

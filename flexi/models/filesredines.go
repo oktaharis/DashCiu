@@ -8,9 +8,6 @@ type FilesRedinesData struct {
 	Claim             		 string `json:"claim"`
 	UpdatedAt	             string `json:"updated_at"`
 	IsProcess	             string `json:"is_process"`
-	Type 	                 string `json:"type"`
-	SummaryProduction        string `json:"summary_production"`
-	SummaryClaim 	         string `json:"summary_claim"`
 }
 
 type PaginatorFilesRedines struct {

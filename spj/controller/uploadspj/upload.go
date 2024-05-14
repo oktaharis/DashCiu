@@ -1,6 +1,7 @@
-package explore
+package upload
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 	"net/http"
@@ -12,22 +13,23 @@ import (
 	"github.com/jeypc/homecontroller/models"
 )
 
-func ExploreSpj(w http.ResponseWriter, r *http.Request) {
-	// Ambil nilai parameter dari URL
-	queryValues := r.URL.Query()
-	yearmonthStr := queryValues.Get("yearmonth")
-	nik := queryValues.Get("nik")
-	name := queryValues.Get("name")
-	noPk := queryValues.Get("no_pk")
-	lengthStr := queryValues.Get("length")
+func UploadSpj(w http.ResponseWriter, r *http.Request) {
+	// Mendekode body request JSON
+	var requestBody map[string]string
+	err := json.NewDecoder(r.Body).Decode(&requestBody)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-	// Konversi length dan yearmonth menjadi integer
-	length, _ := strconv.Atoi(lengthStr)
-	fmt.Println("pagination = ", length)
+	// Mendapatkan nilai dari body request
+	app := "spj"
+	yearmonthStr := requestBody["yearmonth"]
+	typeUpload := requestBody["type"]
+
 	yearmonth, _ := strconv.Atoi(yearmonthStr)
 
-	app := "spj"
-
+	// Koneksi ke database
 	db := models.DBConnections[app]
 	if db == nil {
 		models.ConnectDatabase(app)
@@ -35,7 +37,8 @@ func ExploreSpj(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Query untuk mendapatkan periode
-	query := "SELECT * FROM dashboard.sp_filter('admin', 'production|period');"
+	var query string
+	query = "SELECT * FROM dashboard.sp_filter('admin', 'production|period');"
 	fmt.Println(query)
 
 	var periods []models.Period
@@ -65,36 +68,33 @@ func ExploreSpj(w http.ResponseWriter, r *http.Request) {
 		yearmonth = yearmonthInt
 	}
 
+	// Query untuk mendapatkan data user
 	columns := []string{
-		"no_pk",
-		"nik",
-		"name",
-		"policy",
-		"claim",
-		"policy_yearmonth",
-		"ltc_by_nik",
+		"id", 
+		"product_code", 
+		"origina_fie_name", 
+		"status", 
+		"remark", 
+		"upload_date_time", 
+		"created_at", 
+		"updated_at", 
+		"path", 
+		"type", 
+		"yearmonth", 
+		"processing_time_s",
 	}
 
-	// Query untuk mendapatkan data explore
-	query = "SELECT " + strings.Join(columns, ", ") + " FROM dashboard.summary_explore WHERE "
-
+	// Query untuk mendapatkan data user
+	query = "SELECT " + strings.Join(columns, ", ") + " FROM dashboard.upload WHERE "
 	// Buat filter berdasarkan parameter yang diberikan
 	filters := []string{}
-
-	if nik != "" {
-		filters = append(filters, fmt.Sprintf("nik = '%s'", nik))
-	}
-
-	if noPk != "" {
-		filters = append(filters, fmt.Sprintf("no_pk = '%s'", noPk))
-	}
-
-	if name != "" {
-		filters = append(filters, fmt.Sprintf("name = '%s'", name))
+	
+	if typeUpload != "" {
+		filters = append(filters, fmt.Sprintf("type = '%s'", typeUpload))
 	}
 
 	if yearmonth != 0 {
-		filters = append(filters, fmt.Sprintf("policy_yearmonth = %d", yearmonth))
+		filters = append(filters, fmt.Sprintf("yearmonth = '%d'", yearmonth))
 	}
 
 	// Gabungkan semua filter
@@ -103,11 +103,10 @@ func ExploreSpj(w http.ResponseWriter, r *http.Request) {
 	} else {
 		query += "1 = 1" // Tambahkan kondisi yang selalu benar jika tidak ada filter
 	}
-	fmt.Println("filters:", filters)
+	fmt.Println("inifilters", filters)
 
 	// Query untuk menghitung jumlah total baris yang sesuai dengan kueri
-	countQuery := "SELECT COUNT(*) FROM dashboard.summary_explore WHERE "
-
+	countQuery := "SELECT COUNT(*) FROM dashboard.upload WHERE "
 	// Tambahkan klausa filter sesuai dengan kueri utama
 	if len(filters) > 0 {
 		countQuery += strings.Join(filters, " AND ")
@@ -125,10 +124,6 @@ func ExploreSpj(w http.ResponseWriter, r *http.Request) {
 	// Paginasi data
 	page := 1
 	pageLength := 10
-	if lengthStr != "" {
-		pageLength, _ = strconv.Atoi(lengthStr)
-	}
-
 	offset := (page - 1) * pageLength
 
 	// Tambahkan limit dan offset ke dalam query
@@ -145,25 +140,24 @@ func ExploreSpj(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(query)
 
 	// Iterasi setiap baris hasil query
-	var explores []models.ExploreData
+	var uploads []models.UploadData
 	for rows.Next() {
-		var explore models.ExploreData
+		var upload models.UploadData
 		// Pindai nilai kolom ke dalam variabel struktur
-		if err := rows.Scan(&explore.NoPk, &explore.Nik, &explore.Name, &explore.Policy, &explore.Claim, &explore.PolicyYearmonth, &explore.LtcByNik); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+			if err := rows.Scan(&upload.Id, &upload.ProductCode, &upload.OriginaFileName, &upload.Status, &upload.Remark, &upload.UploadDateTime, &upload.CreatedAt, &upload.UpdatedAt,  &upload.Path, &upload.Type, &upload.Yearmonth, &upload.ProcessingTimeS); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			// Mengubah format yearmonth menjadi "Month YYYY"
+			upload.Yearmonth = convertYearmonth(upload.Yearmonth)
 
-		explore.PolicyYearmonth = convertYearmonthPolicy(explore.PolicyYearmonth)
-		explore.ClaimYearmonth = convertYearmonthClaim(explore.ClaimYearmonth)
-
-		explores = append(explores, explore)
+		uploads = append(uploads, upload)
 	}
 
 	// Siapkan data untuk ditampilkan dalam format JSON
 	// Kirim respons JSON
 	helper.ResponseJSON(w, http.StatusOK, map[string]interface{}{
-		"items":       explores,
+		"items":       uploads,
 		"perPage":     pageLength,
 		"currentPage": page,
 		"path":        r.URL.Path,
@@ -175,28 +169,14 @@ func ExploreSpj(w http.ResponseWriter, r *http.Request) {
 		"total":       totalCount,
 		"lastPage":    int(math.Ceil(float64(totalCount) / float64(pageLength))),
 		"status":      true,
-		"message":     "Berhasil mengambil data explore",
+		"message":     "Berhasil mengambil data user",
 	})
 }
 
 // Mengonversi format yearmonth dari "yyyymm" menjadi "Month YYYY"
-func convertYearmonthPolicy(policyYearmonth string) string {
-	if policyYearmonth == "" {
-        return "" // Jika policyYearmonth kosong, kembalikan nilai kosong
-    }
-    year, _ := strconv.Atoi(policyYearmonth[:4])
-    month, _ := strconv.Atoi(policyYearmonth[4:])
-    monthStr := time.Month(month).String()
-    return fmt.Sprintf("%s %d", monthStr, year)
-}
-
-
-func convertYearmonthClaim(claimYearmonth string) string {
-	if claimYearmonth == "" {
-        return "" // Jika claimYearmonth kosong, kembalikan nilai kosong
-    }
-	year, _ := strconv.Atoi(claimYearmonth[:4])  // Ambil 4 digit pertama sebagai tahun
-	month, _ := strconv.Atoi(claimYearmonth[4:]) // Ambil 2 digit terakhir sebagai bulan
+func convertYearmonth(yearMonthStr string) string {
+	year, _ := strconv.Atoi(yearMonthStr[:4])  // Ambil 4 digit pertama sebagai tahun
+	month, _ := strconv.Atoi(yearMonthStr[4:]) // Ambil 2 digit terakhir sebagai bulan
 	monthStr := time.Month(month).String()     // Konversi angka bulan menjadi nama bulan
 	return fmt.Sprintf("%s %d", monthStr, year)
 }

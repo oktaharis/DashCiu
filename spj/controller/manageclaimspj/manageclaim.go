@@ -1,8 +1,6 @@
 package manageclaim
 
 import (
-	"database/sql"
-	"encoding/json"
 	"fmt"
 	"math"
 	"net/http"
@@ -14,44 +12,42 @@ import (
 	"github.com/jeypc/homecontroller/models"
 )
 
-func IndexClaim(w http.ResponseWriter, r *http.Request) {
-	// Mendekode body request JSON
-	var requestBody map[string]string
-	err := json.NewDecoder(r.Body).Decode(&requestBody)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+func ClaimSpj(w http.ResponseWriter, r *http.Request) {
+	// Ambil nilai parameter dari URL
+	queryValues := r.URL.Query()
+	yearmonthStr := queryValues.Get("yearmonth")
+	search := queryValues.Get("search")
+	remarks := queryValues.Get("remarks")
+	status := queryValues.Get("status")
+	lengthStr := queryValues.Get("length")
+
+	// Jika lengthStr kosong, atur length ke nilai default 10
+	length := 10
+	fmt.Println(length)
+	if lengthStr != "" {
+		var err error
+		length, err = strconv.Atoi(lengthStr)
+		if err != nil {
+			response := map[string]interface{}{"message": "Invalid length", "status": false}
+			helper.ResponseJSON(w, http.StatusBadRequest, response)
+			return
+		}
 	}
 
-	// Mendapatkan nilai dari body request
-	app := requestBody["app"]
-	appChild := requestBody["app_child"]
-	lengthStr := requestBody["length"]
-	yearmonthStr := requestBody["yearmonth"]
-	search := requestBody["search"]
-	status := requestBody["status"]
-
-	// Konversi length dan yearmonth menjadi integer
-	length, _ := strconv.Atoi(lengthStr)
-	fmt.Println("pagination = ", length)
+	// Konversi yearmonth ke integer
 	yearmonth, _ := strconv.Atoi(yearmonthStr)
 
-	// Koneksi ke database
+	app := "spj"
+
 	db := models.DBConnections[app]
 	if db == nil {
 		models.ConnectDatabase(app)
 		db = models.DBConnections[app]
 	}
 
-	// Query untuk mendapatkan periode
-	var query string
-	if app == "kpi" || app == "afi" {
-		query = fmt.Sprintf("SELECT * FROM dashboard.sp_filter('admin', 'production|period', '%s');", app)
-		fmt.Println(query)
-	} else {
-		query = "SELECT * FROM dashboard.sp_filter('admin', 'production|period');"
-		fmt.Println(query)
-	}
+	// Query untuk mendapatkan periods
+	query := "SELECT * FROM dashboard.sp_filter('admin', 'production|period');"
+	fmt.Println(query)
 
 	var periods []models.Period
 	rows, err := db.Raw(query).Rows()
@@ -81,129 +77,50 @@ func IndexClaim(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Query untuk mendapatkan data claim
-	var columns []string
-	switch app {
-	case "flexi":
-		columns = []string{
-			"claim_id",
-			"no_rekening",
-			"no_polis",
-			"nama",
-			"usia",
-			"jenis_kelamin",
-			"jangka",
-			"kantor_cabang",
-			"tgl_pengajuan",
-			"tgl_kolektibility_3",
-			"nilai_pengajuan",
-			"hutang_pokok",
-			"nominal_disetujui",
-			"rekening_koran",
-			"data_nasabah",
-			"status",
-			"yearmonth",
-			"created_at",
-			"updated_at",
-			"batch_policy",
-			"hak_klaim_80",
-			"tsi",
-			"premi",
-		}
-
-	case "kpi", "afi":
-		columns = []string{
-			"claim_id",
-			"loan_id",
-			"contract_number",
-			"nominal_outstanding",
-			"dpd",
-			"funding_partner",
-			"product",
-			"tenor",
-			"premium_amount",
-			"status",
-			"remark",
-			"yearmonth",
-			"batch_policy",
-			"load_id",
-			"created_at",
-		}
-	case "adk":
-		columns = []string{
-			"claim_id",
-			"policy_id",
-			"nomor_peminjaman",
-			"tanggal_klaim",
-			"jumlah_klaim",
-			"pokok_kredit",
-			"status",
-			"remark",
-			"yearmonth",
-			"batch_policy",
-			"created_at",
-		}
-	default:
-		columns = []string{
-			"claim_id",
-			"product_key",
-			"premium",
-			"tanggal_pengajuan_klaim_bni",
-			"no_rekening",
-			"no_perjanjian_kredit",
-			"nama",
-			"tgl_lahir",
-			"no_ktp",
-			"nilai_kredit_dasar",
-			"nilai_klaim",
-			"tgl_mulai",
-			"tgl_akhir",
-			"tenor",
-			"created_at",
-			"updated_at",
-			"filename",
-			"status_claim",
-			"remark",
-			"yearmonth",
-			"category",
-		}
+	columns := []string{
+		"claim_id",
+		"product_key",
+		"premium",
+		"tanggal_pengajuan_klaim_bni",
+		"no_rekening",
+		"no_perjanjian_kredit",
+		"nama",
+		"tgl_lahir",
+		"no_ktp",
+		"nilai_kredit_dasar",
+		"nilai_klaim",
+		"tgl_mulai",
+		"tgl_akhir",
+		"tenor",
+		"created_at",
+		"updated_at",
+		"filename",
+		"status_claim",
+		"remark",
+		"yearmonth",
+		"batch_policy",
+		"category",
 	}
-
 
 	// Query untuk mendapatkan data claim
 	query = "SELECT " + strings.Join(columns, ", ") + " FROM dashboard.claim WHERE "
 	// Buat filter berdasarkan parameter yang diberikan
 	filters := []string{}
 
-	if search != "" && app != "kpi" && app != "afi" {
+	if search != "" {
 		filters = append(filters, fmt.Sprintf("no_rekening = '%s'", search))
 	}
 
-	if search != "" && app == "adk" {
-		filters = append(filters, fmt.Sprintf("nomor_peminjaman = '%s'", search))
+	if remarks != "" {
+		filters = append(filters, fmt.Sprintf("remark = '%s'", remarks))
 	}
 
-	if status != "All Status" && app != "flexi" && app != "kpi" && app != "afi" {
+	if status != "" {
 		filters = append(filters, fmt.Sprintf("status_claim = '%s'", status))
 	}
 
-	if status != "All Status" && (app == "flexi" || app == "kpi" || app == "afi") {
-		filters = append(filters, fmt.Sprintf("status = '%s'", status))
-	}
-
-	if appChild != "All" && (app == "kpi" || app == "afi") {
-		filters = append(filters, fmt.Sprintf("product = '%s'", appChild))
-	}
-
 	if yearmonth != 0 {
-		filters = append(filters, fmt.Sprintf("yearmonth = '%d'", yearmonth))
-	}
-
-	if app == "kpi" {
-		filters = append(filters, "funding_partner = 'PT Bank Jago Tbk'")
-	}
-
-	if app == "afi" {
-		filters = append(filters, "funding_partner = 'PT ATOME FINANCE INDONESIA'")
+		filters = append(filters, fmt.Sprintf("yearmonth = %d", yearmonth))
 	}
 
 	// Gabungkan semua filter
@@ -212,7 +129,7 @@ func IndexClaim(w http.ResponseWriter, r *http.Request) {
 	} else {
 		query += "1 = 1" // Tambahkan kondisi yang selalu benar jika tidak ada filter
 	}
-	fmt.Println("inifilters", filters)
+	fmt.Println("filters:", filters)
 
 	// Query untuk menghitung jumlah total baris yang sesuai dengan kueri
 	countQuery := "SELECT COUNT(*) FROM dashboard.claim WHERE "
@@ -250,54 +167,22 @@ func IndexClaim(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rows.Close()
 
-	fmt.Println(query)
+	fmt.Println("Query:", query)
 
 	// Iterasi setiap baris hasil query
 	var claims []models.ClaimListData
 	for rows.Next() {
 		var claim models.ClaimListData
 		// Pindai nilai kolom ke dalam variabel struktur
-		switch app {
-		case "flexi":
-			var usia sql.NullString // Tambahkan variabel untuk menangani kolom usia
-
-			if err := rows.Scan(&claim.ClaimId, &claim.NoRekening, &claim.NoPolis, &claim.Nama, &claim.Usia, &claim.JenisKelamin, &claim.Jangka, &claim.KantorCabang, &claim.TglPengajuan, &claim.TglKolektibility3, &claim.NilaiPengajuan, &claim.HutangPokok,  &claim.NominalDisetujui, &claim.RekeningKoran,  &claim.DataNasabah,  &claim.Status, &claim.Yearmonth, &claim.CreatedAt, &claim.UpdatedAt, &claim.BatchPolicy, &claim.HakKlaim80, &claim.Tsi, &claim.Premi); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			// Menangani nilai NULL untuk usia
-			setStringIfValid := func(src sql.NullString) string {
-				if src.Valid {
-					return src.String
-				}
-				return "" // Atur nilai menjadi string kosong jika nilainya NULL
-			}
-
-			// Assign nilai usia ke variabel claim
-			claim.Usia = setStringIfValid(usia)
-
-		case "kpi", "afi":
-			if err := rows.Scan(&claim.ClaimId, &claim.LoanId, &claim.ContractNumber, &claim.NominalOutstanding, &claim.Dpd, &claim.FundingPartner, &claim.Product, &claim.Tenor, &claim.PremiumAmount, &claim.Status, &claim.Remark, &claim.Yearmonth, &claim.BatchPolicy, &claim.LoanId, &claim.CreatedAt); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-
-		case "adk":
-			if err := rows.Scan(&claim.ClaimId, &claim.PolicyId, &claim.NomorPeminjaman, &claim.TanggalClaim, &claim.JumlahKlaim, &claim.PokokKredit, &claim.Status, &claim.Remark, &claim.Yearmonth, &claim.BatchPolicy, &claim.BatchPolicy); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-		default:
-			var nilaiKlaim float64
-			if err := rows.Scan(&claim.ClaimId, &claim.ProductKey, &claim.Premium, &claim.TanggalPengajuanKlaimBni, &claim.NoRekening, &claim.NoPerjanjianKredit, &claim.Nama, &claim.TglLahir, &claim.NoKtp, &claim.NilaiKreditDasar, &claim.NilaiKlaim, &claim.TglMulai, &claim.TglAkhir, &claim.Tenor, &claim.CreatedAt, &claim.UpdatedAt, &claim.Filename, &claim.StatusClaim, &claim.Remark, &claim.Yearmonth, &claim.Category); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			// Mengonversi nilai harga_pertanggungan menjadi format yang mudah dibaca
-			claim.NilaiKlaim = fmt.Sprintf("%.0f", nilaiKlaim)
-			// Mengubah format yearmonth menjadi "Month YYYY"
-			claim.Yearmonth = convertYearmonth(claim.Yearmonth)
+		var nilaiKlaim float64
+		if err := rows.Scan(&claim.ClaimId, &claim.ProductKey, &claim.Premium, &claim.TanggalPengajuanKlaimBni, &claim.NoRekening, &claim.NoPerjanjianKredit, &claim.Nama, &claim.TglLahir, &claim.NoKtp, &claim.NilaiKreditDasar, &nilaiKlaim, &claim.TglMulai, &claim.TglAkhir, &claim.Tenor, &claim.CreatedAt, &claim.UpdatedAt, &claim.Filename, &claim.StatusClaim, &claim.Remark, &claim.Yearmonth,  &claim.BatchPolicy, &claim.Category); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
+		// Mengonversi nilai harga_pertanggungan menjadi format yang mudah dibaca
+		claim.NilaiKlaim = fmt.Sprintf("%.0f", nilaiKlaim)
+		// Mengubah format yearmonth menjadi "Month YYYY"
+		claim.Yearmonth = convertYearmonth(claim.Yearmonth)
 
 		claims = append(claims, claim)
 	}
@@ -315,11 +200,12 @@ func IndexClaim(w http.ResponseWriter, r *http.Request) {
 		"onEachSide":  3,
 		"options":     map[string]string{"path": r.URL.Path, "pageName": "page"},
 		"total":       totalCount,
-		"lastPage":    int(math.Ceil(float64(totalCount) / float64(pageLength))),
+		 "lastPage":    int(math.Ceil(float64(totalCount) / float64(pageLength))),
 		"status":      true,
 		"message":     "Berhasil mengambil data claim",
 	})
 }
+
 
 // Mengonversi format yearmonth dari "yyyymm" menjadi "Month YYYY"
 func convertYearmonth(yearMonthStr string) string {

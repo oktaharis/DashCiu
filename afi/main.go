@@ -5,9 +5,10 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/jeypc/homecontroller/controller/explorespl"
-	"github.com/jeypc/homecontroller/controller/filesredinesspl"
-	"github.com/jeypc/homecontroller/controller/manageclaimspl"
+	"github.com/jeypc/homecontroller/controller/dashboardafi"
+	filereadinessafi "github.com/jeypc/homecontroller/controller/filereadiness"
+	manageclaimafi "github.com/jeypc/homecontroller/controller/manageclaim"
+	managepolicyafi "github.com/jeypc/homecontroller/controller/managepolicy"
 )
 
 func main() {
@@ -15,9 +16,10 @@ func main() {
 
 	// Menggunakan variabel app dalam URL dan membiarkan page sebagai query parameter
 
-	r.HandleFunc("/explorespl", explore.ExploreSpl).Methods("POST")
-	r.HandleFunc("/filesredinesspl", filesredines.FilesSpl).Methods("POST")
-	r.HandleFunc("/manageclaimspl", manageclaim.ClaimSpl).Methods("POST")
+	r.HandleFunc("/dashboard", dashboardafi.IndexDashAfi).Methods("GET")
+	r.HandleFunc("/managepolicy", managepolicyafi.IndexPolicyAfi).Methods("GET")
+	r.HandleFunc("/manageclaim", manageclaimafi.IndexClaim).Methods("GET")
+	r.HandleFunc("/fileredines", filereadinessafi.IndexFilesAfi).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

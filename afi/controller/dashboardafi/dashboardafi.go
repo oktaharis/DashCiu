@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"homecontroller/helper"
-	"homecontroller/models"
+	"aficontroller/helper"
+	"aficontroller/models"
 )
 
 // Import paket yang diperlukan

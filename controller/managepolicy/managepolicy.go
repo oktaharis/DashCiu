@@ -12,19 +12,18 @@ import (
 )
 
 func IndexPolicy(w http.ResponseWriter, r *http.Request) {
-	// Dekode input JSON dari request body
-	var dashboardInput map[string]string
-	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&dashboardInput); err != nil {
-		response := map[string]interface{}{"message": err.Error(), "status": false}
-		helper.ResponseJSON(w, http.StatusBadRequest, response)
-		return
+	// Ambil nilai parameter dari URL
+	dashboardInput := r.URL.Query()
+	yearmonth := dashboardInput.Get("yearmonth")
+	search := dashboardInput.Get("search")
+	status := dashboardInput.Get("status")
+	risk := dashboardInput.Get("risk")
+	length := 10
+	if lenStr := dashboardInput.Get("length"); lenStr != "" {
+		length, _ = strconv.Atoi(lenStr)
 	}
 
-	// Ambil nilai parameter dari input JSON
-	yearmonth := dashboardInput["yearmonth"]
-	app := dashboardInput["app"]
-	appChild := dashboardInput["app_child"]
+	app := "afi"
 
 	// Koneksi ke database
 	db := models.DBConnections[app]

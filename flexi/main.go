@@ -9,13 +9,15 @@ import (
 	"github.com/jeypc/homecontroller/controller/filesredinesflexi"
 	"github.com/jeypc/homecontroller/controller/manageclaimflexi"
 	"github.com/jeypc/homecontroller/controller/managepolicyflexi"
-	"github.com/jeypc/homecontroller/controller/userflexi"
-	"github.com/jeypc/homecontroller/controller/uploadflexi"
 	"github.com/jeypc/homecontroller/controller/subrogationflexi"
+	"github.com/jeypc/homecontroller/controller/uploadflexi"
+	"github.com/jeypc/homecontroller/controller/userflexi"
+	"github.com/jeypc/homecontroller/models"
 )
 
 func main() {
 	r := mux.NewRouter()
+	models.ConnectDatabase("flexi")
 
 	// Menggunakan variabel app dalam URL dan membiarkan page sebagai query parameter
 	r.HandleFunc("/filesredinesflexi", filesredines.FilesFlexi).Methods("GET")

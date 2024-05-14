@@ -13,11 +13,12 @@ import (
 	"github.com/jeypc/homecontroller/controller/subrogationspj"
 	"github.com/jeypc/homecontroller/controller/uploadspj"
 	"github.com/jeypc/homecontroller/controller/userspj"
+	"github.com/jeypc/homecontroller/models"
 )
 
 func main() {
 	r := mux.NewRouter()
-
+	models.ConnectDatabase("spj")
 	// Menggunakan variabel app dalam URL dan membiarkan page sebagai query parameter
 	
 	r.HandleFunc("/explorespj", explore.ExploreSpj).Methods("GET")

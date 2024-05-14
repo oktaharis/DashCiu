@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"homecontroller/helper"
-	"homecontroller/models"
+	"aficontroller/helper"
+	"aficontroller/models"
 )
 
 func IndexClaim(w http.ResponseWriter, r *http.Request) {

@@ -1,4 +1,4 @@
-module github.com/jeypc/homecontroller
+module splcontroller
 
 go 1.21.6
 

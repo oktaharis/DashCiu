@@ -4,19 +4,22 @@ import (
 	"log"
 	"net/http"
 
+	dashboardhandler "splcontroller/controller/dashboardspl"
+	"splcontroller/controller/explorespl"
+	"splcontroller/controller/filesredinesspl"
+	"splcontroller/controller/manageclaimspl"
+	managepolicyspl "splcontroller/controller/managepolicy"
+	"splcontroller/controller/subrogationspl"
+	"splcontroller/controller/uploadspl"
+	"splcontroller/controller/userspl"
+	"splcontroller/models"
+
 	"github.com/gorilla/mux"
-	dashboardhandler "github.com/jeypc/homecontroller/controller/dashboardspl"
-	"github.com/jeypc/homecontroller/controller/explorespl"
-	"github.com/jeypc/homecontroller/controller/filesredinesspl"
-	"github.com/jeypc/homecontroller/controller/manageclaimspl"
-	managepolicyspl "github.com/jeypc/homecontroller/controller/managepolicy"
-	"github.com/jeypc/homecontroller/controller/subrogationspl"
-	"github.com/jeypc/homecontroller/controller/uploadspl"
-	"github.com/jeypc/homecontroller/controller/userspl"
 )
 
 func main() {
 	r := mux.NewRouter()
+	models.ConnectDatabase("spl")
 
 	// Menggunakan variabel app dalam URL dan membiarkan page sebagai query parameter
 	

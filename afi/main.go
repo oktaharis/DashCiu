@@ -4,18 +4,20 @@ import (
 	"log"
 	"net/http"
 
+	"aficontroller/controller/dashboardafi"
+	filereadinessafi "aficontroller/controller/filereadiness"
+	manageclaimafi "aficontroller/controller/manageclaim"
+	managepolicyafi "aficontroller/controller/managepolicy"
+	"aficontroller/models"
+
 	"github.com/gorilla/mux"
-	"homecontroller/controller/dashboardafi"
-	filereadinessafi "homecontroller/controller/filereadiness"
-	manageclaimafi "homecontroller/controller/manageclaim"
-	managepolicyafi "homecontroller/controller/managepolicy"
 )
 
 func main() {
 	r := mux.NewRouter()
 
 	// Menggunakan variabel app dalam URL dan membiarkan page sebagai query parameter
-
+	models.ConnectDatabase("afi")
 	r.HandleFunc("/dashboard", dashboardafi.IndexDashAfi).Methods("GET")
 	r.HandleFunc("/managepolicy", managepolicyafi.IndexPolicyAfi).Methods("GET")
 	r.HandleFunc("/manageclaim", manageclaimafi.IndexClaim).Methods("GET")

@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"homecontroller/helper"
-	"homecontroller/models"
+	"aficontroller/helper"
+	"aficontroller/models"
 )
 func IndexFilesAfi(w http.ResponseWriter, r *http.Request) {
 	// Mendapatkan nilai dari URL query parameters

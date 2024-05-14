@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jeypc/homecontroller/helper"
-	"github.com/jeypc/homecontroller/models"
+	"aficontroller/helper"
+	"aficontroller/models"
 )
 
 func IndexPolicyAfi(w http.ResponseWriter, r *http.Request) {

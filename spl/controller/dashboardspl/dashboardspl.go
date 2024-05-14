@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/jeypc/homecontroller/helper"
-	"github.com/jeypc/homecontroller/models"
+	"splcontroller/helper"
+	"splcontroller/models"
 )
 
 // Import paket yang diperlukan

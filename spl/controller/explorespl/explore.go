@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jeypc/homecontroller/helper"
-	"github.com/jeypc/homecontroller/models"
+	"splcontroller/helper"
+	"splcontroller/models"
 )
 
 func ExploreSpl(w http.ResponseWriter, r *http.Request) {

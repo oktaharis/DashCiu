@@ -5,10 +5,10 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/jeypc/homecontroller/controller/dashboardafi"
-	filereadinessafi "github.com/jeypc/homecontroller/controller/filereadiness"
-	manageclaimafi "github.com/jeypc/homecontroller/controller/manageclaim"
-	managepolicyafi "github.com/jeypc/homecontroller/controller/managepolicy"
+	"homecontroller/controller/dashboardafi"
+	filereadinessafi "homecontroller/controller/filereadiness"
+	manageclaimafi "homecontroller/controller/manageclaim"
+	managepolicyafi "homecontroller/controller/managepolicy"
 )
 
 func main() {

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/jeypc/homecontroller/helper"
-	"github.com/jeypc/homecontroller/models"
+	"homecontroller/helper"
+	"homecontroller/models"
 )
 
 // Import paket yang diperlukan

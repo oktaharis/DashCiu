@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jeypc/homecontroller/helper"
-	"github.com/jeypc/homecontroller/models"
+	"homecontroller/helper"
+	"homecontroller/models"
 )
 func IndexFilesAfi(w http.ResponseWriter, r *http.Request) {
 	// Mendapatkan nilai dari URL query parameters

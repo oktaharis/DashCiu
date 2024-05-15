@@ -41,12 +41,12 @@ func main() {
 
 	// ini period
 
-	r.HandleFunc("/dashboard/period", dashboardperiodspl.DashboardPeriodSpl).Methods("GET")
-	r.HandleFunc("/managepolicy/period", policyperiodspl.PolicyPeriodSpl).Methods("GET")
-	r.HandleFunc("/manageclaim/period", claimperiodspl.ClaimPeriodSpl).Methods("GET")
-	r.HandleFunc("/subgrogation/period", subrogationperiodspl.SubroPeriodSpl).Methods("GET")
-	r.HandleFunc("/files-rediness/period", filereadinesperiodspl.FilePeriodSpl).Methods("GET")
-	r.HandleFunc("/file-upload/period", uploadperiodspl.UploadPeriodSpl).Methods("GET")
+	r.HandleFunc("/dashboardspl/period", dashboardperiodspl.DashboardPeriodSpl).Methods("GET")
+	r.HandleFunc("/managepolicyspl/period", policyperiodspl.PolicyPeriodSpl).Methods("GET")
+	r.HandleFunc("/manageclaimspl/period", claimperiodspl.ClaimPeriodSpl).Methods("GET")
+	r.HandleFunc("/subgrogationspl/period", subrogationperiodspl.SubroPeriodSpl).Methods("GET")
+	r.HandleFunc("/files-redinessspl/period", filereadinesperiodspl.FilePeriodSpl).Methods("GET")
+	r.HandleFunc("/file-uploadspl/period", uploadperiodspl.UploadPeriodSpl).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

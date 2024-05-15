@@ -41,7 +41,7 @@ func IndexDashAdk(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Ambil nilai parameter app
-	app := "adakami"
+	app := "adk"
 
 	// Koneksi ke database
 	db := models.DBConnections[app]

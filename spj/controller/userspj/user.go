@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jeypc/homecontroller/helper"
-	"github.com/jeypc/homecontroller/models"
+	"splcontroller/helper"
+	"splcontroller/models"
 )
 
 func UserSpj(w http.ResponseWriter, r *http.Request) {

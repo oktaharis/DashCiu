@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jeypc/homecontroller/helper"
-	"github.com/jeypc/homecontroller/models"
+	"adkcontroller/helper"
+	"adkcontroller/models"
 )
 
 func IndexClaim(w http.ResponseWriter, r *http.Request) {

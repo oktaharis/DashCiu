@@ -5,9 +5,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/jeypc/homecontroller/controller/explorespl"
-	"github.com/jeypc/homecontroller/controller/filesredinesspl"
-	"github.com/jeypc/homecontroller/controller/manageclaimspl"
+	"adkcontroller/controller/manageclaimadk"
+	"adkcontroller/controller/dashboardadk"
 )
 
 func main() {

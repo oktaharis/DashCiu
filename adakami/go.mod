@@ -1,4 +1,4 @@
-module github.com/jeypc/homecontroller
+module adkcontroller
 
 go 1.21.6
 

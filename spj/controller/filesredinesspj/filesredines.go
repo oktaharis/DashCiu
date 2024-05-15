@@ -1,7 +1,6 @@
 package filesredines
 
 import (
-	"encoding/json"
 	"fmt"
 	"math"
 	"net/http"
@@ -13,23 +12,16 @@ import (
 	"github.com/jeypc/homecontroller/models"
 )
 
-func IndexFiles(w http.ResponseWriter, r *http.Request) {
-	// Mendekode body request JSON
-	var requestBody map[string]string
-	err := json.NewDecoder(r.Body).Decode(&requestBody)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+func FilesSpj(w http.ResponseWriter, r *http.Request) {
+	// Ambil nilai parameter dari URL
+	queryValues := r.URL.Query()
+	yearmonthStr := queryValues.Get("yearmonth")
 
-	// Mendapatkan nilai dari body request
-	app := requestBody["app"]
-	yearmonthStr := requestBody["yearmonth"]
-	appChild := requestBody["app_child"]
-	
+	// Konversi yearmonth menjadi integer
 	yearmonth, _ := strconv.Atoi(yearmonthStr)
 
 	// Koneksi ke database
+	app := "spj"
 	db := models.DBConnections[app]
 	if db == nil {
 		models.ConnectDatabase(app)
@@ -37,14 +29,8 @@ func IndexFiles(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Query untuk mendapatkan periode
-	var query string
-	if app == "kpi" || app == "afi" {
-		query = fmt.Sprintf("SELECT * FROM dashboard.sp_filter('admin', 'production|period', '%s');", app)
-		fmt.Println(query)
-	} else {
-		query = "SELECT * FROM dashboard.sp_filter('admin', 'production|period');"
-		fmt.Println(query)
-	}
+	query := "SELECT * FROM dashboard.sp_filter('admin', 'production|period');"
+	fmt.Println(query)
 
 	var periods []models.Period
 	rows, err := db.Raw(query).Rows()
@@ -74,31 +60,14 @@ func IndexFiles(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Query untuk mendapatkan data files redines
-	var columns []string
-	switch app {
-	case "kpi", "afi":
-		columns = []string{
-			"yearmonth",
-			"label",
-			"policy",
-			"claim",
-			"updated_at",
-			"is_process",
-			"type",
-			"summary_production",
-			"summary_claim",
-		}
-	default:
-		columns = []string{
-			"yearmonth",
-			"label",
-			"policy",
-			"claim",
-			"updated_at",
-			"is_process",
-		}
+	columns := []string{
+		"yearmonth",
+		"label",
+		"policy",
+		"claim",
+		"updated_at",
+		"is_process",
 	}
-
 
 	// Query untuk mendapatkan data files redines
 	query = "SELECT " + strings.Join(columns, ", ") + " FROM dashboard.files_redines WHERE "
@@ -106,11 +75,7 @@ func IndexFiles(w http.ResponseWriter, r *http.Request) {
 	filters := []string{}
 
 	if yearmonth != 0 {
-		filters = append(filters, fmt.Sprintf("yearmonth = '%d'", yearmonth))
-	}
-	
-	if appChild != "All" && (app == "kpi" || app == "afi") {
-		filters = append(filters, fmt.Sprintf("type = '%s'", appChild))
+		filters = append(filters, fmt.Sprintf("yearmonth = %d", yearmonth))
 	}
 
 	// Gabungkan semua filter
@@ -160,20 +125,12 @@ func IndexFiles(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var file models.FilesRedinesData
 		// Pindai nilai kolom ke dalam variabel struktur
-		switch app {
-		case "kpi", "afi":
-			if err := rows.Scan(&file.Yearmonth, &file.Label, &file.Policy, &file.Claim, &file.UpdatedAt, &file.IsProcess, &file.Type, &file.SummaryProduction, &file.SummaryClaim); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-		default:
-			if err := rows.Scan(&file.Yearmonth, &file.Label, &file.Policy, &file.Claim, &file.UpdatedAt, &file.IsProcess); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			// Mengubah format yearmonth menjadi "Month YYYY"
-			file.Yearmonth = convertYearmonth(file.Yearmonth)
+		if err := rows.Scan(&file.Yearmonth, &file.Label, &file.Policy, &file.Claim, &file.UpdatedAt, &file.IsProcess); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
+		// Mengubah format yearmonth menjadi "Month YYYY"
+		file.Yearmonth = convertYearmonth(file.Yearmonth)
 
 		files = append(files, file)
 	}
@@ -196,6 +153,7 @@ func IndexFiles(w http.ResponseWriter, r *http.Request) {
 		"message":     "Berhasil mengambil data files redines",
 	})
 }
+
 
 // Mengonversi format yearmonth dari "yyyymm" menjadi "Month YYYY"
 func convertYearmonth(yearMonthStr string) string {

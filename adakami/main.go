@@ -12,6 +12,7 @@ import (
 
 func main() {
 	r := mux.NewRouter()
+	models.ConnectDatabase()
 
 	// Menggunakan variabel app dalam URL dan membiarkan page sebagai query parameter
 

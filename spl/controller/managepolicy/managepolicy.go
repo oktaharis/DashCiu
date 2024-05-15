@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jeypc/homecontroller/helper"
-	"github.com/jeypc/homecontroller/models"
+	"splcontroller/helper"
+	"splcontroller/models"
 )
 
 func PolicySpl(w http.ResponseWriter, r *http.Request) {
@@ -24,7 +24,7 @@ func PolicySpl(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app := "spl"
-
+	
 	// Koneksi ke database
 	db := models.DBConnections[app]
 	fmt.Println(db)

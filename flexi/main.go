@@ -5,19 +5,29 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/jeypc/homecontroller/controller/explorespl"
-	"github.com/jeypc/homecontroller/controller/filesredinesspl"
-	"github.com/jeypc/homecontroller/controller/manageclaimspl"
+	"github.com/jeypc/homecontroller/controller/dashboardflexi"
+	"github.com/jeypc/homecontroller/controller/filesredinesflexi"
+	"github.com/jeypc/homecontroller/controller/manageclaimflexi"
+	"github.com/jeypc/homecontroller/controller/managepolicyflexi"
+	"github.com/jeypc/homecontroller/controller/subrogationflexi"
+	"github.com/jeypc/homecontroller/controller/uploadflexi"
+	"github.com/jeypc/homecontroller/controller/userflexi"
+	"github.com/jeypc/homecontroller/models"
 )
 
 func main() {
 	r := mux.NewRouter()
+	models.ConnectDatabase("flexi")
 
 	// Menggunakan variabel app dalam URL dan membiarkan page sebagai query parameter
+	r.HandleFunc("/filesredinesflexi", filesredines.FilesFlexi).Methods("GET")
+	r.HandleFunc("/manageclaimflexi", manageclaim.ClaimFlexi).Methods("GET")
+	r.HandleFunc("/managepolicyflexi", managepolicy.PolicyFlexi).Methods("GET")
+	r.HandleFunc("/userflexi", user.UserFlexi).Methods("GET")
+	r.HandleFunc("/uploadflexi", upload.UploadFlexi).Methods("GET")
+	r.HandleFunc("/dashboardflexi", dashboardflexi.IndexDashFlexi).Methods("GET")
+	r.HandleFunc("/subrogationflexi", subrogation.SubrogationFlexi).Methods("GET")
 
-	r.HandleFunc("/explorespl", explore.ExploreSpl).Methods("POST")
-	r.HandleFunc("/filesredinesspl", filesredines.FilesSpl).Methods("POST")
-	r.HandleFunc("/manageclaimspl", manageclaim.ClaimSpl).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

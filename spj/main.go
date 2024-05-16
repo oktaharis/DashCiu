@@ -26,7 +26,7 @@ import (
 
 func main() {
 	r := mux.NewRouter()
-	models.ConnectDatabase("spj")
+	models.ConnectDatabase()
 	// Menggunakan variabel app dalam URL dan membiarkan page sebagai query parameter
 	
 	r.HandleFunc("/explorespj", explore.ExploreSpj).Methods("GET")

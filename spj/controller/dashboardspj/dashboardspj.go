@@ -40,16 +40,11 @@ func IndexDashSpj(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Ambil nilai parameter app
-	app := "spj"
 
-	// Koneksi ke database
-	db := models.DBConnections[app]
-	fmt.Println(db)
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
+
+		// Koneksi ke database
+		models.ConnectDatabase()
+		db := models.DB
 
 	// Query untuk mendapatkan data sesuai dengan parameter yang diberikan
 	var query string

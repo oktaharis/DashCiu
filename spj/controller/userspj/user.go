@@ -22,7 +22,7 @@ func UserSpj(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Mendapatkan nilai dari body request
-	app := "user_man"
+
 	userInput := r.URL.Query()
 	name := userInput.Get("name")
 	idUser := userInput.Get("id")
@@ -30,24 +30,23 @@ func UserSpj(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(idUser)
 
 	// Koneksi ke database
-	db := models.DBConnections[app]
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
+
+	// Koneksi ke database
+	models.ConnectDatabase()
+	db := models.DB
 
 	var query string
 
 	// Query untuk mendapatkan data user
 	columns := []string{
-		"id", 
-		"name", 
+		"id",
+		"name",
 		"email",
-		"phone", 
-		"status", 
-		"created_at", 
-		"updated_at", 
-		"role_id", 
+		"phone",
+		"status",
+		"created_at",
+		"updated_at",
+		"role_id",
 		"product_id",
 	}
 
@@ -55,7 +54,7 @@ func UserSpj(w http.ResponseWriter, r *http.Request) {
 	query = "SELECT " + strings.Join(columns, ", ") + " FROM dashboard.users WHERE "
 	// Buat filter berdasarkan parameter yang diberikan
 	filters := []string{}
-	
+
 	if name != "" {
 		filters = append(filters, fmt.Sprintf("name = '%s'", name))
 	}
@@ -111,10 +110,10 @@ func UserSpj(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var user models.UserData
 		// Pindai nilai kolom ke dalam variabel struktur
-			if err := rows.Scan(&user.Id, &user.Name, &user.Email, &user.Phone, &user.Status, &user.CreatedAt, &user.UpdatedAt,  &user.RoleId, &user.ProductId); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
+		if err := rows.Scan(&user.Id, &user.Name, &user.Email, &user.Phone, &user.Status, &user.CreatedAt, &user.UpdatedAt, &user.RoleId, &user.ProductId); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
 		users = append(users, user)
 	}

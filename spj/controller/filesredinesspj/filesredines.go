@@ -20,13 +20,11 @@ func FilesSpj(w http.ResponseWriter, r *http.Request) {
 	// Konversi yearmonth menjadi integer
 	yearmonth, _ := strconv.Atoi(yearmonthStr)
 
-	// Koneksi ke database
-	app := "spj"
-	db := models.DBConnections[app]
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
+	
+
+		// Koneksi ke database
+		models.ConnectDatabase()
+		db := models.DB
 
 	// Query untuk mendapatkan periode
 	query := "SELECT * FROM dashboard.sp_filter('admin', 'production|period');"

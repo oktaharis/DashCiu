@@ -23,18 +23,17 @@ func UploadSpj(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Mendapatkan nilai dari body request
-	app := "spj"
+	
 	yearmonthStr := requestBody["yearmonth"]
 	typeUpload := requestBody["type"]
 
 	yearmonth, _ := strconv.Atoi(yearmonthStr)
 
-	// Koneksi ke database
-	db := models.DBConnections[app]
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
+	
+
+		// Koneksi ke database
+		models.ConnectDatabase()
+		db := models.DB
 
 	// Query untuk mendapatkan periode
 	var query string

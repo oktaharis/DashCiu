@@ -23,16 +23,9 @@ func PolicySpj(w http.ResponseWriter, r *http.Request) {
 		length, _ = strconv.Atoi(lenStr)
 	}
 
-	app := "spj"
-
-	// Koneksi ke database
-	db := models.DBConnections[app]
-	fmt.Println(db)
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
-	fmt.Println(app)
+		// Koneksi ke database
+		models.ConnectDatabase()
+		db := models.DB
 
 	// Set kolom yang akan diambil dari tabel
 	columns := []string{

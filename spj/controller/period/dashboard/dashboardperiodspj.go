@@ -13,14 +13,11 @@ func DashboardPeriodSpj(w http.ResponseWriter, r *http.Request) {
 	params := r.URL.Query()
 	page := params.Get("page")
 
-	// Koneksi ke database
-	app := "spj"
-	db := models.DBConnections[app]
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
 
+
+		// Koneksi ke database
+		models.ConnectDatabase()
+		db := models.DB
 	// Query untuk mendapatkan semua data periode
 	query := fmt.Sprintf("SELECT yearmonth, label FROM dashboard.sp_filter('admin', '%s|period')", page)
 

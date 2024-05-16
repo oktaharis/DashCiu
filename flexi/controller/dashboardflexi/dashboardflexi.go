@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/jeypc/homecontroller/helper"
-	"github.com/jeypc/homecontroller/models"
+	"flexicontroller/helper"
+	"flexicontroller/models"
 )
 
 func IndexDashFlexi(w http.ResponseWriter, r *http.Request) {

@@ -26,13 +26,9 @@ func ExploreSpl(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("pagination = ", length)
 	yearmonth, _ := strconv.Atoi(yearmonthStr)
 
-	app := "spl"
-
-	db := models.DBConnections[app]
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
+	// Koneksi ke database
+	models.ConnectDatabase()
+	db := models.DB
 
 	// Query untuk mendapatkan periode
 	query := "SELECT * FROM dashboard.sp_filter('admin', 'production|period');"

@@ -37,13 +37,9 @@ func SubrogationSpl(w http.ResponseWriter, r *http.Request) {
 
 	yearmonth, _ := strconv.Atoi(yearmonthStr)
 
-	app := "spl"
-
-	db := models.DBConnections[app]
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
+// Koneksi ke database
+models.ConnectDatabase()
+db := models.DB
 
 	var items []models.TableData
 	var totalCount int

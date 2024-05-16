@@ -9,25 +9,24 @@ import (
 	"splcontroller/controller/filesredinesspl"
 	"splcontroller/controller/manageclaimspl"
 	managepolicyspl "splcontroller/controller/managepolicy"
-	"splcontroller/controller/subrogationspl"
-	"splcontroller/controller/uploadspl"
-	"splcontroller/controller/userspl"
-	"splcontroller/models"
-	"splcontroller/controller/period/dashboard"
 	"splcontroller/controller/period/claim"
+	"splcontroller/controller/period/dashboard"
 	"splcontroller/controller/period/filereadines"
 	"splcontroller/controller/period/policy"
 	"splcontroller/controller/period/subrogation"
 	"splcontroller/controller/period/upload"
-
+	"splcontroller/controller/subrogationspl"
+	"splcontroller/controller/uploadspl"
+	"splcontroller/controller/userspl"
+	"splcontroller/models"
 
 	"github.com/gorilla/mux"
-)
+) 
 
 func main() {
-	r := mux.NewRouter()
-	models.ConnectDatabase("spl")
-
+    r := mux.NewRouter()
+	// Koneksi ke database saat aplikasi dimulai
+	models.ConnectDatabase()
 	// Menggunakan variabel app dalam URL dan membiarkan page sebagai query parameter
 	
 	r.HandleFunc("/explorespl", explore.ExploreSpl).Methods("GET")

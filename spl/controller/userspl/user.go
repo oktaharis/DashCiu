@@ -22,18 +22,14 @@ func UserSpl(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Mendapatkan nilai dari body request
-	app := "user_man"
 	name := requestBody["name"]
 	idUser := requestBody["id"]
 
 	id, _ := strconv.Atoi(idUser)
 
 	// Koneksi ke database
-	db := models.DBConnections[app]
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
+	models.ConnectDatabase()
+	db := models.DB
 
 	var query string
 

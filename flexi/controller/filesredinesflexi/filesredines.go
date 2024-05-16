@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jeypc/homecontroller/helper"
-	"github.com/jeypc/homecontroller/models"
+	"flexicontroller/helper"
+	"flexicontroller/models"
 )
 
 func FilesFlexi(w http.ResponseWriter, r *http.Request) {

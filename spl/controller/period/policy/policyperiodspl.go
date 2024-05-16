@@ -11,12 +11,8 @@ func PolicyPeriodSpl(w http.ResponseWriter, r *http.Request) {
 	// Ambil nilai parameter dari URL
 
 	// Koneksi ke database
-	app := "spl"
-	db := models.DBConnections[app]
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
+	models.ConnectDatabase()
+	db := models.DB
 
 	// Query untuk mendapatkan semua data periode
 	query := ("SELECT yearmonth, label FROM dashboard.sp_filter('admin', 'production|period')")

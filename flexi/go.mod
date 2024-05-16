@@ -1,4 +1,4 @@
-module github.com/jeypc/homecontroller
+module flexicontroller
 
 go 1.21.6
 

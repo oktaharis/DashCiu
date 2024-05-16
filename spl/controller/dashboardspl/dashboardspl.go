@@ -10,7 +10,6 @@ import (
 	"splcontroller/models"
 )
 
-// Import paket yang diperlukan
 func IndexDashSpl(w http.ResponseWriter, r *http.Request) {
 	// Ambil nilai parameter dari URL
 	params := r.URL.Query()
@@ -40,16 +39,9 @@ func IndexDashSpl(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Ambil nilai parameter app
-	app := "spl"
-
 	// Koneksi ke database
-	db := models.DBConnections[app]
-	fmt.Println(db)
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
+	models.ConnectDatabase()
+	db := models.DB
 
 	// Query untuk mendapatkan data sesuai dengan parameter yang diberikan
 	var query string
@@ -167,7 +159,6 @@ func IndexDashSpl(w http.ResponseWriter, r *http.Request) {
 			} else {
 				periodParams = fmt.Sprintf("'%s_%s'", yearmonth, yearmonthend)
 			}
-
 			query = fmt.Sprintf("SELECT * FROM dashboard.sp_dashboard('admin', 'summary_production', %s) LIMIT ?", periodParams)
 			fmt.Println("Query:", query)
 

@@ -37,13 +37,9 @@ func ClaimSpl(w http.ResponseWriter, r *http.Request) {
 	// Konversi yearmonth ke integer
 	yearmonth, _ := strconv.Atoi(yearmonthStr)
 
-	app := "spl"
-
-	db := models.DBConnections[app]
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
+// Koneksi ke database
+models.ConnectDatabase()
+db := models.DB
 
 	// Query untuk mendapatkan periods
 	query := "SELECT * FROM dashboard.sp_filter('admin', 'production|period');"

@@ -5,14 +5,21 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/jeypc/homecontroller/controller/dashboardflexi"
-	"github.com/jeypc/homecontroller/controller/filesredinesflexi"
-	"github.com/jeypc/homecontroller/controller/manageclaimflexi"
-	"github.com/jeypc/homecontroller/controller/managepolicyflexi"
-	"github.com/jeypc/homecontroller/controller/subrogationflexi"
-	"github.com/jeypc/homecontroller/controller/uploadflexi"
-	"github.com/jeypc/homecontroller/controller/userflexi"
-	"github.com/jeypc/homecontroller/models"
+	"flexicontroller/controller/dashboardflexi"
+	"flexicontroller/controller/filesredinesflexi"
+	"flexicontroller/controller/manageclaimflexi"
+	"flexicontroller/controller/managepolicyflexi"
+	"flexicontroller/controller/subrogationflexi"
+	"flexicontroller/controller/uploadflexi"
+	"flexicontroller/controller/userflexi"
+	"flexicontroller/models"
+
+	"flexicontroller/controller/period/dashboard"
+	"flexicontroller/controller/period/claim"
+	"flexicontroller/controller/period/policy"
+	"flexicontroller/controller/period/subrogation"
+	"flexicontroller/controller/period/upload"
+
 )
 
 func main() {
@@ -28,6 +35,13 @@ func main() {
 	r.HandleFunc("/dashboardflexi", dashboardflexi.IndexDashFlexi).Methods("GET")
 	r.HandleFunc("/subrogationflexi", subrogation.SubrogationFlexi).Methods("GET")
 
+	// ini adalah period
+	
+	r.HandleFunc("/dashboard/period", dashboardperiodflexi.DashboardPeriodFlexi).Methods("GET")
+	r.HandleFunc("/manageclaim/period", claimperiodflexi.ClaimPeriodFlexi).Methods("GET")
+	r.HandleFunc("/managepolicy/period", policyperiodflexi.PolicyPeriodFlexi).Methods("GET")
+	r.HandleFunc("/subgrogation/period", subrogationperiodflexi.SubroPeriodFlexi).Methods("GET")
+	r.HandleFunc("/file-upload/period", uploadperiodflexi.UploadPeriodFlexi).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

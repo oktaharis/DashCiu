@@ -5,20 +5,22 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/jeypc/homecontroller/controller/explorespl"
-	"github.com/jeypc/homecontroller/controller/filesredinesspl"
-	"github.com/jeypc/homecontroller/controller/manageclaimspl"
+	"adkcontroller/models"
+
+	"adkcontroller/controller/dashboardadk"
+	"adkcontroller/controller/managepolicyadk"
+	"adkcontroller/controller/manageclaimadk"
 )
 
 func main() {
 	r := mux.NewRouter()
-	models.ConnectDatabase()
+	models.ConnectDatabase("adk")
 
 	// Menggunakan variabel app dalam URL dan membiarkan page sebagai query parameter
 
-	r.HandleFunc("/explorespl", explore.ExploreSpl).Methods("POST")
-	r.HandleFunc("/filesredinesspl", filesredines.FilesSpl).Methods("POST")
-	r.HandleFunc("/manageclaimspl", manageclaim.ClaimSpl).Methods("POST")
+	r.HandleFunc("/dashboardadk", dashboardhandler.IndexDashAdk).Methods("GET")
+	r.HandleFunc("/managepolicyadk", managepolicy.IndexPolicyAdk).Methods("GET")
+	r.HandleFunc("/manageclaimadk", manageclaim.IndexClaimAdk).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

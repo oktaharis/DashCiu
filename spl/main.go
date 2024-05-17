@@ -17,7 +17,6 @@ import (
 	"splcontroller/controller/period/upload"
 	"splcontroller/controller/subrogationspl"
 	"splcontroller/controller/uploadspl"
-	"splcontroller/controller/userspl"
 	"splcontroller/models"
 
 	"github.com/gorilla/mux"
@@ -36,7 +35,6 @@ func main() {
 	r.HandleFunc("/dashboardspl", dashboardhandler.IndexDashSpl).Methods("GET")
 	r.HandleFunc("/subrogationspl", subrogation.SubrogationSpl).Methods("GET")
 	r.HandleFunc("/uploadspl", upload.UploadSpl).Methods("GET")
-	r.HandleFunc("/userspl", user.UserSpl).Methods("GET")
 
 	// ini period
 

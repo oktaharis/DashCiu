@@ -11,7 +11,6 @@ import (
 	"flexicontroller/controller/managepolicyflexi"
 	"flexicontroller/controller/subrogationflexi"
 	"flexicontroller/controller/uploadflexi"
-	"flexicontroller/controller/userflexi"
 	"flexicontroller/models"
 
 	"flexicontroller/controller/period/dashboard"
@@ -30,7 +29,6 @@ func main() {
 	r.HandleFunc("/filesredinesflexi", filesredines.FilesFlexi).Methods("GET")
 	r.HandleFunc("/manageclaimflexi", manageclaim.ClaimFlexi).Methods("GET")
 	r.HandleFunc("/managepolicyflexi", managepolicy.PolicyFlexi).Methods("GET")
-	r.HandleFunc("/userflexi", user.UserFlexi).Methods("GET")
 	r.HandleFunc("/uploadflexi", upload.UploadFlexi).Methods("GET")
 	r.HandleFunc("/dashboardflexi", dashboardflexi.IndexDashFlexi).Methods("GET")
 	r.HandleFunc("/subrogationflexi", subrogation.SubrogationFlexi).Methods("GET")

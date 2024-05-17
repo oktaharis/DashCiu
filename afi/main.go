@@ -8,7 +8,6 @@ import (
 	 "aficontroller/controller/filereadiness"
 	 "aficontroller/controller/manageclaim"
 	 "aficontroller/controller/managepolicy"
-	 "aficontroller/controller/user"
 	"aficontroller/models"
 	"aficontroller/controller/period/claim"
 	"aficontroller/controller/period/dashboard"
@@ -27,7 +26,6 @@ func main() {
 	r.HandleFunc("/managepolicyafi", managepolicyafi.IndexPolicyAfi).Methods("GET")
 	r.HandleFunc("/manageclaimafi", manageclaimafi.IndexClaim).Methods("GET")
 	r.HandleFunc("/fileredinesafi", filereadinessafi.IndexFilesAfi).Methods("GET")
-	r.HandleFunc("/userafi", userafi.UserAfi).Methods("GET")
 
 	// ini period
 	r.HandleFunc("/claimafi/period", claimperiodafi.ClaimPeriodAfi).Methods("GET")

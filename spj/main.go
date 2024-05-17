@@ -12,7 +12,6 @@ import (
 	managepolicyspj "splcontroller/controller/managepolicyspj"
 	"splcontroller/controller/subrogationspj"
 	"splcontroller/controller/uploadspj"
-	"splcontroller/controller/userspj"
 	"splcontroller/models"
 
 	"splcontroller/controller/period/dashboard"
@@ -36,7 +35,6 @@ func main() {
 	r.HandleFunc("/dashboardspj", dashboardhandler.IndexDashSpj).Methods("GET")
 	r.HandleFunc("/subrogationspj", subrogation.SubrogationSpj).Methods("GET")
 	r.HandleFunc("/uploadspj", upload.UploadSpj).Methods("GET")
-	r.HandleFunc("/userspj", user.UserSpj).Methods("GET")
 
 	// ini adalah period
 		

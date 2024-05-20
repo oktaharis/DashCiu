@@ -20,9 +20,9 @@ func FilesSpl(w http.ResponseWriter, r *http.Request) {
 	// Konversi yearmonth menjadi integer
 	yearmonth, _ := strconv.Atoi(yearmonthStr)
 
-// Koneksi ke database
-models.ConnectDatabase()
-db := models.DB
+	// Koneksi ke database
+	models.ConnectDatabase()
+	db := models.DB
 
 	// Query untuk mendapatkan periode
 	query := "SELECT * FROM dashboard.sp_filter('admin', 'production|period');"
@@ -130,6 +130,14 @@ db := models.DB
 
 		files = append(files, file)
 	}
+	if len(files) == 0 {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data fileread",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
+	}
 
 	// Siapkan data untuk ditampilkan dalam format JSON
 	// Kirim respons JSON
@@ -149,7 +157,6 @@ db := models.DB
 		"message":     "Berhasil mengambil data files redines",
 	})
 }
-
 
 // Mengonversi format yearmonth dari "yyyymm" menjadi "Month YYYY"
 func convertYearmonth(yearMonthStr string) string {

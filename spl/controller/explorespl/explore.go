@@ -155,6 +155,14 @@ func ExploreSpl(w http.ResponseWriter, r *http.Request) {
 
 		explores = append(explores, explore)
 	}
+	if len(explores) == 0 {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data explore",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
+	}
 
 	// Siapkan data untuk ditampilkan dalam format JSON
 	// Kirim respons JSON

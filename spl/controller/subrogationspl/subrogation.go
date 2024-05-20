@@ -95,6 +95,15 @@ db := models.DB
 		helper.ResponseJSON(w, http.StatusInternalServerError, response)
 		return
 	}
+	// Siapkan data untuk ditampilkan dalam format JSON
+	if len(items) == 0 {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data subrogation",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
+	}
 
 	response := map[string]interface{}{
 		"Items":       items,

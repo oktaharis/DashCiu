@@ -14,8 +14,8 @@ func DashboardPeriodFlexi(w http.ResponseWriter, r *http.Request) {
 	page := params.Get("page")
 
 	// Koneksi ke database
-models.ConnectDatabase()
-db := models.DB
+	models.ConnectDatabase()
+	db := models.DB
 
 	// Query untuk mendapatkan semua data periode
 	query := fmt.Sprintf("SELECT yearmonth, label FROM dashboard.sp_filter('admin', '%s|period')", page)

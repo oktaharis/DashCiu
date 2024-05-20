@@ -40,15 +40,14 @@ func IndexDashSpj(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-
-
-		// Koneksi ke database
-		models.ConnectDatabase()
-		db := models.DB
+	// Koneksi ke database
+	models.ConnectDatabase()
+	db := models.DB
 
 	// Query untuk mendapatkan data sesuai dengan parameter yang diberikan
 	var query string
 	var results interface{} // Variabel untuk hasil yang akan dikembalikan
+	var isEmptyResults bool // Variabel untuk memeriksa apakah hasil kosong
 	switch page {
 	case "production":
 		var productionResults []models.ProductionData
@@ -94,6 +93,7 @@ func IndexDashSpj(w http.ResponseWriter, r *http.Request) {
 		}
 
 		results = productionResults
+		isEmptyResults = len(productionResults) == 0
 
 	case "claim", "summary":
 		var resultsData interface{}
@@ -151,6 +151,7 @@ func IndexDashSpj(w http.ResponseWriter, r *http.Request) {
 			}
 
 			resultsData = claimResults
+			isEmptyResults = len(claimResults) == 0
 
 		} else if page == "summary" {
 			var summaryResults []models.SummaryData
@@ -204,6 +205,7 @@ func IndexDashSpj(w http.ResponseWriter, r *http.Request) {
 			}
 
 			resultsData = summaryResults
+			isEmptyResults = len(summaryResults) == 0
 		}
 
 		results = resultsData
@@ -214,6 +216,15 @@ func IndexDashSpj(w http.ResponseWriter, r *http.Request) {
 			"message": "failed, invalid parameter",
 		}
 		helper.ResponseJSON(w, http.StatusOK, responseData)
+		return
+	}
+	// Cek apakah results kosong atau tidak
+	if results == nil || isEmptyResults {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data dashboard",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
 		return
 	}
 

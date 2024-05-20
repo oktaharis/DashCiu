@@ -36,8 +36,8 @@ func ClaimFlexi(w http.ResponseWriter, r *http.Request) {
 	yearmonth, _ := strconv.Atoi(yearmonthStr)
 
 	// Koneksi ke database
-models.ConnectDatabase()
-db := models.DB
+	models.ConnectDatabase()
+	db := models.DB
 
 	// Query untuk mendapatkan periode
 	query := "SELECT * FROM dashboard.sp_filter('admin', 'production|period');"
@@ -188,7 +188,7 @@ db := models.DB
 	if len(claims) == 0 {
 		responseData := map[string]interface{}{
 			"status":  false,
-			"message": "failed, get data  claim",
+			"message": "failed, get data claim",
 		}
 		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
 		return

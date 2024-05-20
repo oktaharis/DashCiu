@@ -141,7 +141,7 @@ func FilesFlexi(w http.ResponseWriter, r *http.Request) {
 	if len(files) == 0 {
 		responseData := map[string]interface{}{
 			"status":  false,
-			"message": "failed, get data fileread",
+			"message": "failed, get data files readines",
 		}
 		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
 		return

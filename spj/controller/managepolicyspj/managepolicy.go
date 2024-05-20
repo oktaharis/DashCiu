@@ -155,6 +155,14 @@ func PolicySpj(w http.ResponseWriter, r *http.Request) {
 
 		policies = append(policies, policy)
 	}
+	if len(policies) == 0 {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data policy",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
+	}
 
 	// Siapkan data untuk ditampilkan dalam format JSON
 	responseData := map[string]interface{}{

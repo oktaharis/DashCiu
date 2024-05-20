@@ -37,9 +37,9 @@ func ClaimSpl(w http.ResponseWriter, r *http.Request) {
 	// Konversi yearmonth ke integer
 	yearmonth, _ := strconv.Atoi(yearmonthStr)
 
-// Koneksi ke database
-models.ConnectDatabase()
-db := models.DB
+	// Koneksi ke database
+	models.ConnectDatabase()
+	db := models.DB
 
 	// Query untuk mendapatkan periods
 	query := "SELECT * FROM dashboard.sp_filter('admin', 'production|period');"
@@ -181,6 +181,14 @@ db := models.DB
 
 		claims = append(claims, claim)
 	}
+	if len(claims) == 0 {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data claim",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
+	}
 
 	// Siapkan data untuk ditampilkan dalam format JSON
 	// Kirim respons JSON
@@ -195,12 +203,11 @@ db := models.DB
 		"onEachSide":  3,
 		"options":     map[string]string{"path": r.URL.Path, "pageName": "page"},
 		"total":       totalCount,
-		 "lastPage":    int(math.Ceil(float64(totalCount) / float64(pageLength))),
+		"lastPage":    int(math.Ceil(float64(totalCount) / float64(pageLength))),
 		"status":      true,
 		"message":     "Berhasil mengambil data claim",
 	})
 }
-
 
 // Mengonversi format yearmonth dari "yyyymm" menjadi "Month YYYY"
 func convertYearmonth(yearMonthStr string) string {

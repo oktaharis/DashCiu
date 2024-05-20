@@ -95,6 +95,14 @@ func SubrogationSpj(w http.ResponseWriter, r *http.Request) {
 		helper.ResponseJSON(w, http.StatusInternalServerError, response)
 		return
 	}
+	if len(items) == 0 {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data subrogationx",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
+	}
 
 	response := map[string]interface{}{
 		"Items":       items,

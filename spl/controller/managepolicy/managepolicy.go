@@ -22,9 +22,9 @@ func PolicySpl(w http.ResponseWriter, r *http.Request) {
 	if lenStr := dashboardInput.Get("length"); lenStr != "" {
 		length, _ = strconv.Atoi(lenStr)
 	}
-// Koneksi ke database
-models.ConnectDatabase()
-db := models.DB
+	// Koneksi ke database
+	models.ConnectDatabase()
+	db := models.DB
 
 	// Set kolom yang akan diambil dari tabel
 	columns := []string{
@@ -154,6 +154,14 @@ db := models.DB
 
 		policies = append(policies, policy)
 	}
+	if len(policies) == 0 {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data policy",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
+	}
 
 	// Siapkan data untuk ditampilkan dalam format JSON
 	responseData := map[string]interface{}{
@@ -167,5 +175,3 @@ db := models.DB
 	// Kirim respons JSON
 	helper.ResponseJSON(w, http.StatusOK, responseData)
 }
-
-

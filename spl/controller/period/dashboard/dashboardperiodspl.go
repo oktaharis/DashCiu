@@ -58,6 +58,14 @@ func DashboardPeriodSpl(w http.ResponseWriter, r *http.Request) {
 			"Label":     period.Label,
 		})
 	}
+	if len(responseData) == 0 {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data period dashboard",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
+	}
 
 	// Kirim respons JSON
 	helper.ResponseJSON(w, http.StatusOK, map[string]interface{}{
@@ -66,4 +74,3 @@ func DashboardPeriodSpl(w http.ResponseWriter, r *http.Request) {
 		"message": "success",
 	})
 }
-

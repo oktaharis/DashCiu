@@ -22,10 +22,9 @@ func PolicyFlexi(w http.ResponseWriter, r *http.Request) {
 		length, _ = strconv.Atoi(lenStr)
 	}
 
-
 	// Koneksi ke database
-models.ConnectDatabase()
-db := models.DB
+	models.ConnectDatabase()
+	db := models.DB
 
 	// Set kolom yang akan diambil dari tabel
 	columns := []string{
@@ -150,8 +149,7 @@ db := models.DB
 	for rows.Next() {
 		var policy models.PolicyData
 		// Pindai nilai kolom ke dalam variabel struktur
-		if err := rows.Scan(&policy.PolicyNumber, &policy.Periode, &policy.KantorCabang, &policy.NoRekening, &policy.NoKTP, &policy.CIF, &policy.NamaDebitur, &policy.TanggalLahir, &policy.JenisKelamin, &policy.Produk, &policy.KodeProduk, &policy.SubProduk, &policy.ProdukFintech, &policy.Kategori, &policy.NamaPerusahaan, &policy.MulaiAsuransi, &policy.SelesaiAsuransi, &policy.JangkaWaktu, &policy.LimitPlafond, &policy.NilaiPertanggungan, &policy.RatePremi, &policy.Premi, &policy.TglPencairan, &policy.TglPK, &policy.NoPK, &policy.NamaProgram, &policy.IsCBC, &policy.Coverage, &policy.NomorPolis, &policy.URLSertifikat, &policy.YearMonth, &policy.CreatedAt, &policy.Risk, &policy.Status, &policy.PSJT, &policy.SisaBulan, &policy.PremiRefund, &policy.RemarkRefund, &policy.ExpiredDate,
-			); err != nil {
+		if err := rows.Scan(&policy.PolicyNumber, &policy.Periode, &policy.KantorCabang, &policy.NoRekening, &policy.NoKTP, &policy.CIF, &policy.NamaDebitur, &policy.TanggalLahir, &policy.JenisKelamin, &policy.Produk, &policy.KodeProduk, &policy.SubProduk, &policy.ProdukFintech, &policy.Kategori, &policy.NamaPerusahaan, &policy.MulaiAsuransi, &policy.SelesaiAsuransi, &policy.JangkaWaktu, &policy.LimitPlafond, &policy.NilaiPertanggungan, &policy.RatePremi, &policy.Premi, &policy.TglPencairan, &policy.TglPK, &policy.NoPK, &policy.NamaProgram, &policy.IsCBC, &policy.Coverage, &policy.NomorPolis, &policy.URLSertifikat, &policy.YearMonth, &policy.CreatedAt, &policy.Risk, &policy.Status, &policy.PSJT, &policy.SisaBulan, &policy.PremiRefund, &policy.RemarkRefund, &policy.ExpiredDate); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -177,5 +175,3 @@ db := models.DB
 	// Kirim respons JSON
 	helper.ResponseJSON(w, http.StatusOK, responseData)
 }
-
-

@@ -60,7 +60,7 @@ func SubroPeriodFlexi(w http.ResponseWriter, r *http.Request) {
 	if len(results) == 0 {
 		helper.ResponseJSON(w, http.StatusNotFound, map[string]interface{}{
 			"status":  false,
-			"message": "failed, get data period subgrogation",
+			"message": "failed, get data period subrogation",
 		})
 		return
 	}

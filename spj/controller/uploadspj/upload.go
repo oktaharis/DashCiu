@@ -23,17 +23,15 @@ func UploadSpj(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Mendapatkan nilai dari body request
-	
+
 	yearmonthStr := requestBody["yearmonth"]
 	typeUpload := requestBody["type"]
 
 	yearmonth, _ := strconv.Atoi(yearmonthStr)
 
-	
-
-		// Koneksi ke database
-		models.ConnectDatabase()
-		db := models.DB
+	// Koneksi ke database
+	models.ConnectDatabase()
+	db := models.DB
 
 	// Query untuk mendapatkan periode
 	var query string
@@ -69,17 +67,17 @@ func UploadSpj(w http.ResponseWriter, r *http.Request) {
 
 	// Query untuk mendapatkan data user
 	columns := []string{
-		"id", 
-		"product_code", 
-		"origina_fie_name", 
-		"status", 
-		"remark", 
-		"upload_date_time", 
-		"created_at", 
-		"updated_at", 
-		"path", 
-		"type", 
-		"yearmonth", 
+		"id",
+		"product_code",
+		"origina_fie_name",
+		"status",
+		"remark",
+		"upload_date_time",
+		"created_at",
+		"updated_at",
+		"path",
+		"type",
+		"yearmonth",
 		"processing_time_s",
 	}
 
@@ -87,7 +85,7 @@ func UploadSpj(w http.ResponseWriter, r *http.Request) {
 	query = "SELECT " + strings.Join(columns, ", ") + " FROM dashboard.upload WHERE "
 	// Buat filter berdasarkan parameter yang diberikan
 	filters := []string{}
-	
+
 	if typeUpload != "" {
 		filters = append(filters, fmt.Sprintf("type = '%s'", typeUpload))
 	}
@@ -143,14 +141,22 @@ func UploadSpj(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var upload models.UploadData
 		// Pindai nilai kolom ke dalam variabel struktur
-			if err := rows.Scan(&upload.Id, &upload.ProductCode, &upload.OriginaFileName, &upload.Status, &upload.Remark, &upload.UploadDateTime, &upload.CreatedAt, &upload.UpdatedAt,  &upload.Path, &upload.Type, &upload.Yearmonth, &upload.ProcessingTimeS); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			// Mengubah format yearmonth menjadi "Month YYYY"
-			upload.Yearmonth = convertYearmonth(upload.Yearmonth)
+		if err := rows.Scan(&upload.Id, &upload.ProductCode, &upload.OriginaFileName, &upload.Status, &upload.Remark, &upload.UploadDateTime, &upload.CreatedAt, &upload.UpdatedAt, &upload.Path, &upload.Type, &upload.Yearmonth, &upload.ProcessingTimeS); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		// Mengubah format yearmonth menjadi "Month YYYY"
+		upload.Yearmonth = convertYearmonth(upload.Yearmonth)
 
 		uploads = append(uploads, upload)
+	}
+	if len(uploads) == 0 {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data upload",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
 	}
 
 	// Siapkan data untuk ditampilkan dalam format JSON

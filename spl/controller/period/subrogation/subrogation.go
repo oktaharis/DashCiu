@@ -54,6 +54,14 @@ db := models.DB
 			"Label":     period.Label,
 		})
 	}
+	// Periksa apakah hasil query kosong
+	if len(results) == 0 {
+		helper.ResponseJSON(w, http.StatusNotFound, map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data period subrogation",
+		})
+		return
+	}
 
 	// Kirim respons JSON
 	helper.ResponseJSON(w, http.StatusOK, map[string]interface{}{

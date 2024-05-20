@@ -10,11 +10,9 @@ import (
 func PolicyPeriodSpj(w http.ResponseWriter, r *http.Request) {
 	// Ambil nilai parameter dari URL
 
-	
-
-		// Koneksi ke database
-		models.ConnectDatabase()
-		db := models.DB
+	// Koneksi ke database
+	models.ConnectDatabase()
+	db := models.DB
 
 	// Query untuk mendapatkan semua data periode
 	query := ("SELECT yearmonth, label FROM dashboard.sp_filter('admin', 'production|period')")
@@ -56,6 +54,14 @@ func PolicyPeriodSpj(w http.ResponseWriter, r *http.Request) {
 			"YearMonth": "Batch - " + period.Label,
 			"Label":     period.Label,
 		})
+	}
+	if len(responseData) == 0 {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data period policy",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
 	}
 
 	// Kirim respons JSON

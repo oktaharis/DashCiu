@@ -150,7 +150,15 @@ db := models.DB
 
 		uploads = append(uploads, upload)
 	}
-
+		// Siapkan data untuk ditampilkan dalam format JSON
+		if len(uploads) == 0 {
+			responseData := map[string]interface{}{
+				"status":  false,
+				"message": "failed, get data upload",
+			}
+			helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+			return
+		}
 	// Siapkan data untuk ditampilkan dalam format JSON
 	// Kirim respons JSON
 	helper.ResponseJSON(w, http.StatusOK, map[string]interface{}{

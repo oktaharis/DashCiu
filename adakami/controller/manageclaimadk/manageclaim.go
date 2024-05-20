@@ -167,6 +167,14 @@ func IndexClaimAdk(w http.ResponseWriter, r *http.Request) {
 
 		claims = append(claims, claim)
 	}
+	if len(claims) == 0 {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data claim",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
+	}
 
 	// Siapkan data untuk ditampilkan dalam format JSON
 	// Kirim respons JSON

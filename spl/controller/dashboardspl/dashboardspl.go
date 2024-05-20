@@ -46,6 +46,7 @@ func IndexDashSpl(w http.ResponseWriter, r *http.Request) {
 	// Query untuk mendapatkan data sesuai dengan parameter yang diberikan
 	var query string
 	var results interface{} // Variabel untuk hasil yang akan dikembalikan
+	var isEmptyResults bool // Variabel untuk memeriksa apakah hasil kosong
 	switch page {
 	case "production":
 		var productionResults []models.ProductionData
@@ -91,6 +92,7 @@ func IndexDashSpl(w http.ResponseWriter, r *http.Request) {
 		}
 
 		results = productionResults
+		isEmptyResults = len(productionResults) == 0
 
 	case "claim", "summary":
 		var resultsData interface{}
@@ -138,16 +140,7 @@ func IndexDashSpl(w http.ResponseWriter, r *http.Request) {
 				claimResults = append(claimResults, result)
 			}
 
-			if len(claimResults) == 0 {
-				responseData := map[string]interface{}{
-					"status":  false,
-					"message": "failed",
-				}
-				helper.ResponseJSON(w, http.StatusOK, responseData)
-				return
-			}
-
-			resultsData = claimResults
+			isEmptyResults = len(claimResults) == 0
 
 		} else if page == "summary" {
 			var summaryResults []models.SummaryData
@@ -190,19 +183,9 @@ func IndexDashSpl(w http.ResponseWriter, r *http.Request) {
 				summaryResults = append(summaryResults, result)
 			}
 
-			if len(summaryResults) == 0 {
-				responseData := map[string]interface{}{
-					"status":  false,
-					"message": "failed",
-				}
-				helper.ResponseJSON(w, http.StatusOK, responseData)
-				return
-			}
-
-			resultsData = summaryResults
+			results = resultsData
+			isEmptyResults = len(summaryResults) == 0
 		}
-
-		results = resultsData
 
 	default:
 		responseData := map[string]interface{}{
@@ -210,6 +193,15 @@ func IndexDashSpl(w http.ResponseWriter, r *http.Request) {
 			"message": "failed, invalid parameter",
 		}
 		helper.ResponseJSON(w, http.StatusOK, responseData)
+		return
+	}
+	// Cek apakah results kosong atau tidak
+	if results == nil || isEmptyResults {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data dashboard",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
 		return
 	}
 

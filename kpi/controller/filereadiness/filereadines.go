@@ -11,6 +11,7 @@ import (
 	"kpicontroller/helper"
 	"kpicontroller/models"
 )
+
 func IndexFilesAfi(w http.ResponseWriter, r *http.Request) {
 	// Mendapatkan nilai dari URL query parameters
 	queryParams := r.URL.Query()
@@ -25,37 +26,36 @@ func IndexFilesAfi(w http.ResponseWriter, r *http.Request) {
 
 	// Query untuk mendapatkan periode
 	var query string
-	
-		query = fmt.Sprintf("SELECT * FROM dashboard.sp_filter('admin', 'production|period', 'kpi');")
-		fmt.Println(query)
 
-		var periods []models.Period
-		rows, err := db.Raw(query).Rows()
+	query = "SELECT * FROM dashboard.sp_filter('admin', 'production|period', 'kpi');"
+	fmt.Println(query)
+
+	var periods []models.Period
+	rows, err := db.Raw(query).Rows()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var period models.Period
+		if err := rows.Scan(&period.YearMonth, &period.Label); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		periods = append(periods, period)
+	}
+
+	// Set parameter periode default jika tidak disediakan
+	if yearmonth == 0 && len(periods) > 0 {
+		yearmonthInt, err := strconv.Atoi(periods[len(periods)-1].YearMonth)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		defer rows.Close()
-
-		for rows.Next() {
-			var period models.Period
-			if err := rows.Scan(&period.YearMonth, &period.Label); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			periods = append(periods, period)
-		}
-
-		// Set parameter periode default jika tidak disediakan
-		if yearmonth == 0 && len(periods) > 0 {
-			yearmonthInt, err := strconv.Atoi(periods[len(periods)-1].YearMonth)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			yearmonth = yearmonthInt
-		}
-	
+		yearmonth = yearmonthInt
+	}
 
 	// Query untuk mendapatkan data files redines
 	query = "SELECT yearmonth, label, policy, claim, updated_at, is_process, type, summary_production, summary_claim FROM dashboard.files_redines WHERE "
@@ -66,7 +66,7 @@ func IndexFilesAfi(w http.ResponseWriter, r *http.Request) {
 		filters = append(filters, fmt.Sprintf("yearmonth = '%d'", yearmonth))
 	}
 
-	if appChild != "All"{
+	if appChild != "All" {
 		filters = append(filters, fmt.Sprintf("type = '%s'", appChild))
 	}
 
@@ -138,6 +138,15 @@ func IndexFilesAfi(w http.ResponseWriter, r *http.Request) {
 
 		files = append(files, file)
 	}
+	// Cek apakah data files kosong
+	if len(files) == 0 {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data fileread",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
+	}
 
 	// Siapkan data untuk ditampilkan dalam format JSON
 	helper.ResponseJSON(w, http.StatusOK, map[string]interface{}{
@@ -156,5 +165,3 @@ func IndexFilesAfi(w http.ResponseWriter, r *http.Request) {
 		"message":     "Berhasil mengambil data files redines",
 	})
 }
-
-

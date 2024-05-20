@@ -12,7 +12,6 @@ import (
 
 func PolicyFlexi(w http.ResponseWriter, r *http.Request) {
 	// Ambil nilai parameter dari URL
-	app := "flexi"
 	dashboardInput := r.URL.Query()
 	yearmonth := dashboardInput.Get("yearmonth")
 	search := dashboardInput.Get("search")
@@ -25,13 +24,8 @@ func PolicyFlexi(w http.ResponseWriter, r *http.Request) {
 
 
 	// Koneksi ke database
-	db := models.DBConnections[app]
-	fmt.Println(db)
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
-	fmt.Println(app)
+models.ConnectDatabase()
+db := models.DB
 
 	// Set kolom yang akan diambil dari tabel
 	columns := []string{
@@ -163,7 +157,14 @@ func PolicyFlexi(w http.ResponseWriter, r *http.Request) {
 		}
 		policies = append(policies, policy)
 	}
-
+	if len(policies) == 0 {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data policy",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
+	}
 	// Siapkan data untuk ditampilkan dalam format JSON
 	responseData := map[string]interface{}{
 		"data":            policies,

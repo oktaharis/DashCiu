@@ -11,12 +11,8 @@ func ClaimPeriodFlexi(w http.ResponseWriter, r *http.Request) {
 	// Ambil nilai parameter dari URL
 
 	// Koneksi ke database
-	app := "flexi"
-	db := models.DBConnections[app]
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
+	models.ConnectDatabase()
+	db := models.DB
 
 	// Query untuk mendapatkan semua data periode
 	query := ("SELECT yearmonth, label FROM dashboard.sp_filter('admin', 'claim|period')")
@@ -58,6 +54,14 @@ func ClaimPeriodFlexi(w http.ResponseWriter, r *http.Request) {
 			"YearMonth": "Batch - " + period.Label,
 			"Label":     period.Label,
 		})
+	}
+	if len(responseData) == 0 {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data period claim",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
 	}
 
 	// Kirim respons JSON

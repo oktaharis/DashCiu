@@ -14,12 +14,8 @@ func DashboardPeriodFlexi(w http.ResponseWriter, r *http.Request) {
 	page := params.Get("page")
 
 	// Koneksi ke database
-	app := "flexi"
-	db := models.DBConnections[app]
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
+models.ConnectDatabase()
+db := models.DB
 
 	// Query untuk mendapatkan semua data periode
 	query := fmt.Sprintf("SELECT yearmonth, label FROM dashboard.sp_filter('admin', '%s|period')", page)
@@ -61,6 +57,14 @@ func DashboardPeriodFlexi(w http.ResponseWriter, r *http.Request) {
 			"YearMonth": "Batch - " + period.Label,
 			"Label":     period.Label,
 		})
+	}
+	if len(responseData) == 0 {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data period dashboard",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
 	}
 
 	// Kirim respons JSON

@@ -3,7 +3,7 @@ package manageclaimkpi
 import (
 	"fmt"
 	"math"
-	"net/http"
+	"net/http" 
 	"strconv"
 	"strings"
 	"time"
@@ -163,6 +163,15 @@ func IndexClaimKpi(w http.ResponseWriter, r *http.Request) {
 		
 		claims = append(claims, claim)
 	}
+		// Cek apakah data files kosong
+		if len(claims) == 0 {
+			responseData := map[string]interface{}{
+				"status":  false,
+				"message": "failed, get data claim",
+			}
+			helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+			return
+		}
 
 	// Siapkan data untuk ditampilkan dalam format JSON
 	// Kirim respons JSON

@@ -23,7 +23,7 @@ import (
 
 func main() {
 	r := mux.NewRouter()
-	models.ConnectDatabase("flexi")
+	models.ConnectDatabase()
 
 	// Menggunakan variabel app dalam URL dan membiarkan page sebagai query parameter
 	r.HandleFunc("/filesredinesflexi", filesredines.FilesFlexi).Methods("GET")

@@ -16,7 +16,6 @@ func IndexDashAfi(w http.ResponseWriter, r *http.Request) {
 	yearmonth := queryParams.Get("yearmonth")
 	yearmonthend := queryParams.Get("yearmonthend")
 	page := queryParams.Get("page")
-	app := "afi"
 	app_child := queryParams.Get("app_child")
 
 	//  parameter page valid, jika tidak, kembalikan error
@@ -27,18 +26,17 @@ func IndexDashAfi(w http.ResponseWriter, r *http.Request) {
 
 	// Set nilai default yearmonth jika tidak disediakan
 	var periodParams interface{}
+	var isEmptyResults bool // Variabel untuk memeriksa apakah hasil kosong
+
 	if yearmonth == "" || yearmonthend == "" {
 		periodParams = "null"
 	} else {
 		periodParams = fmt.Sprintf("'%s_%s'", yearmonth, yearmonthend)
 	}
-
 	// Koneksi ke database
-	db := models.DBConnections[app]
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
+	models.ConnectDatabase()
+	db := models.DB
+	
 
 	// Jika app_child kosong, beri nilai default "All"
 	if app_child == "" {
@@ -52,10 +50,10 @@ func IndexDashAfi(w http.ResponseWriter, r *http.Request) {
 	case "production":
 		var productionResults []models.ProductionData
 
-		// KPI & Atome
-		paramApp := app + "|" + app_child
+		// AFI & Atome
+		paramApp := "afi" + "|" + app_child
 		if app_child == "All" {
-			paramApp = app
+			paramApp = "afi"
 		}
 		query = fmt.Sprintf("SELECT * FROM dashboard.sp_dashboard('admin', '%s', 'production', %s)", paramApp, periodParams)
 		fmt.Println(query)
@@ -89,14 +87,15 @@ func IndexDashAfi(w http.ResponseWriter, r *http.Request) {
 		}
 
 		results = productionResults
+		isEmptyResults = len(productionResults) == 0
 
 	case "claim":
 		var claimResults []models.ClaimData
 
-		// KPI & Atome
-		paramApp := app + "|" + app_child
+		// AFI & Atome
+		paramApp := "afi" + "|" + app_child
 		if app_child == "All" {
-			paramApp = app
+			paramApp = "afi"
 		}
 		query = fmt.Sprintf("SELECT * FROM dashboard.sp_dashboard('admin', '%s', 'claim', %s)", paramApp, periodParams)
 		fmt.Println(query)
@@ -131,14 +130,15 @@ func IndexDashAfi(w http.ResponseWriter, r *http.Request) {
 		}
 
 		results = claimResults
+		isEmptyResults = len(claimResults) == 0
 
 	case "summary":
 		var summaryResults []models.SummaryData
 
-		// KPI & Atome
-		paramApp := app + "|" + app_child
+		// AFI & Atome
+		paramApp := "afi" + "|" + app_child
 		if app_child == "All" {
-			paramApp = app
+			paramApp = "afi"
 		}
 		query = fmt.Sprintf("SELECT * FROM dashboard.sp_dashboard('admin', '%s', 'summary_production', %s)", paramApp, periodParams)
 		fmt.Println(query)
@@ -172,11 +172,22 @@ func IndexDashAfi(w http.ResponseWriter, r *http.Request) {
 		}
 
 		results = summaryResults
+		isEmptyResults = len(summaryResults) == 0
+
 
 	default:
 		http.Error(w, "Invalid page parameter", http.StatusBadRequest)
 		return
 	}
+	// Cek apakah results kosong atau tidak
+	if results == nil || isEmptyResults {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data dashboard",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
+	}	
 
 	// Siapkan data untuk ditampilkan dalam format JSON
 	responseData := map[string]interface{}{

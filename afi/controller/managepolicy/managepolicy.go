@@ -24,15 +24,8 @@ func IndexPolicyAfi(w http.ResponseWriter, r *http.Request) {
 		length, _ = strconv.Atoi(lenStr)
 	}
 
-	app := "afi"
-
-	// Koneksi ke database
-	db := models.DBConnections[app]
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
-
+	models.ConnectDatabase()
+	db := models.DB
 	// Set kolom yang akan diambil dari tabel
 	columns := []string{
 		"policy_number",
@@ -126,9 +119,9 @@ func IndexPolicyAfi(w http.ResponseWriter, r *http.Request) {
 	if len(policies) == 0 {
 		responseData := map[string]interface{}{
 			"status":  false,
-			"message": "Tidak ada data yang ditemukan",
+			"message": "failed, get data policy",
 		}
-		helper.ResponseJSON(w, http.StatusOK, responseData)
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
 		return
 	}
 

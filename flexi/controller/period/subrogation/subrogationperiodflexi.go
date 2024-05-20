@@ -11,12 +11,8 @@ func SubroPeriodFlexi(w http.ResponseWriter, r *http.Request) {
 	// Ambil nilai parameter dari URL (jika ada, tapi tidak ditampilkan di sini)
 
 	// Koneksi ke database
-	app := "flexi"
-	db := models.DBConnections[app]
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
+	models.ConnectDatabase()
+	db := models.DB
 
 	// Query untuk mendapatkan semua data periode
 	query := "SELECT yearmonth, label FROM dashboard.sp_filter('admin', 'subrogation|period')"
@@ -51,15 +47,7 @@ func SubroPeriodFlexi(w http.ResponseWriter, r *http.Request) {
 		results = append(results, period)
 	}
 
-	// Periksa apakah hasil query kosong
-	if len(results) == 0 {
-		helper.ResponseJSON(w, http.StatusNotFound, map[string]interface{}{
-			"status":  false,
-			"message": "failed to retrieve data",
-		})
-		return
-	}
-
+	
 	// Siapkan data untuk ditampilkan dalam format JSON
 	var responseData []map[string]interface{}
 	for _, period := range results {
@@ -68,7 +56,15 @@ func SubroPeriodFlexi(w http.ResponseWriter, r *http.Request) {
 			"Label":     period.Label,
 		})
 	}
-
+	// Periksa apakah hasil query kosong
+	if len(results) == 0 {
+		helper.ResponseJSON(w, http.StatusNotFound, map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data period subgrogation",
+		})
+		return
+	}
+	
 	// Kirim respons JSON
 	helper.ResponseJSON(w, http.StatusOK, map[string]interface{}{
 		"data":    responseData,

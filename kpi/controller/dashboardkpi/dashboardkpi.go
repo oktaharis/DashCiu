@@ -26,6 +26,8 @@ func IndexDashKpi(w http.ResponseWriter, r *http.Request) {
 
 	// Set nilai default yearmonth jika tidak disediakan
 	var periodParams interface{}
+	var isEmptyResults bool // Variabel untuk memeriksa apakah hasil kosong
+
 	if yearmonth == "" || yearmonthend == "" {
 		periodParams = "null"
 	} else {
@@ -35,7 +37,7 @@ func IndexDashKpi(w http.ResponseWriter, r *http.Request) {
 		// Koneksi ke database
 		models.ConnectDatabase()
 		db := models.DB
-
+ 
 	// Jika app_child kosong, beri nilai default "All"
 	if app_child == "" {
 		app_child = "All"
@@ -85,6 +87,7 @@ func IndexDashKpi(w http.ResponseWriter, r *http.Request) {
 		}
 
 		results = productionResults
+		isEmptyResults = len(productionResults) == 0
 
 	case "claim":
 		var claimResults []models.ClaimData
@@ -127,6 +130,7 @@ func IndexDashKpi(w http.ResponseWriter, r *http.Request) {
 		}
 
 		results = claimResults
+		isEmptyResults = len(claimResults) == 0
 
 	case "summary":
 		var summaryResults []models.SummaryData
@@ -168,12 +172,22 @@ func IndexDashKpi(w http.ResponseWriter, r *http.Request) {
 		}
 
 		results = summaryResults
+		isEmptyResults = len(summaryResults) == 0
 
 	default:
 		http.Error(w, "Invalid page parameter", http.StatusBadRequest)
 		return
 	}
 
+	// Cek apakah results kosong atau tidak
+	if results == nil || isEmptyResults {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data dashboard",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
+	}	
 	// Siapkan data untuk ditampilkan dalam format JSON
 	responseData := map[string]interface{}{
 		"data":    results,

@@ -23,7 +23,6 @@ func ClaimFlexi(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app := "flexi"
 	// Mendapatkan nilai parameter dari URL
 	claimInput := r.URL.Query()
 	lengthStr := claimInput.Get("length")
@@ -37,11 +36,8 @@ func ClaimFlexi(w http.ResponseWriter, r *http.Request) {
 	yearmonth, _ := strconv.Atoi(yearmonthStr)
 
 	// Koneksi ke database
-	db := models.DBConnections[app]
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
+models.ConnectDatabase()
+db := models.DB
 
 	// Query untuk mendapatkan periode
 	query := "SELECT * FROM dashboard.sp_filter('admin', 'production|period');"
@@ -188,6 +184,14 @@ func ClaimFlexi(w http.ResponseWriter, r *http.Request) {
 		claim.Yearmonth = convertYearmonth(claim.Yearmonth)
 
 		claims = append(claims, claim)
+	}
+	if len(claims) == 0 {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data  claim",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
 	}
 
 	// Siapkan data untuk ditampilkan dalam format JSON

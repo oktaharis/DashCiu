@@ -8,7 +8,7 @@ import (
 
 	"kpicontroller/helper"
 	"kpicontroller/models"
-)
+) 
 
 func IndexPolicyKpi(w http.ResponseWriter, r *http.Request) {
 	// Ambil nilai parameter dari URL
@@ -121,9 +121,9 @@ func IndexPolicyKpi(w http.ResponseWriter, r *http.Request) {
 	if len(policies) == 0 {
 		responseData := map[string]interface{}{
 			"status":  false,
-			"message": "Tidak ada data yang ditemukan",
+			"message": "failed, get data policy",
 		}
-		helper.ResponseJSON(w, http.StatusOK, responseData)
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
 		return
 	}
 

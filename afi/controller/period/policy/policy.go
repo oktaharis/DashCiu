@@ -10,16 +10,11 @@ import (
 
 func PolicyPeriodAfi(w http.ResponseWriter, r *http.Request) {
 
-	// Koneksi ke database
-	app := "afi"
-	db := models.DBConnections[app]
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
+models.ConnectDatabase()
+db := models.DB
 
 	// Query untuk mendapatkan semua data periode
-	query := fmt.Sprintf("SELECT yearmonth, label FROM dashboard.sp_filter('admin', 'production|period', '%s')", app)
+	query := "SELECT yearmonth, label FROM dashboard.sp_filter('admin', 'production|period', 'afi')"
 
 	fmt.Println(query)
 
@@ -61,7 +56,14 @@ func PolicyPeriodAfi(w http.ResponseWriter, r *http.Request) {
 			"Label":     period.Label,
 		})
 	}
-
+	if len(responseData) == 0 {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data period policy",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
+	}
 	// Kirim respons JSON
 	helper.ResponseJSON(w, http.StatusOK, map[string]interface{}{
 		"data":    responseData,

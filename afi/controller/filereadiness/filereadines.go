@@ -20,16 +20,12 @@ func IndexFilesAfi(w http.ResponseWriter, r *http.Request) {
 
 	yearmonth, _ := strconv.Atoi(yearmonthStr)
 
-	// Koneksi ke database
-	db := models.DBConnections[app]
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
+		// Koneksi ke database
+		models.ConnectDatabase()
+		db := models.DB
 
 	// Query untuk mendapatkan periode
 	var query string
-	if app == "afi" {
 		query = fmt.Sprintf("SELECT * FROM dashboard.sp_filter('admin', 'production|period', '%s');", app)
 		fmt.Println(query)
 
@@ -59,7 +55,7 @@ func IndexFilesAfi(w http.ResponseWriter, r *http.Request) {
 			}
 			yearmonth = yearmonthInt
 		}
-	}
+	
 
 	// Query untuk mendapatkan data files redines
 	query = "SELECT yearmonth, label, policy, claim, updated_at, is_process, type, summary_production, summary_claim FROM dashboard.files_redines WHERE "
@@ -92,7 +88,7 @@ func IndexFilesAfi(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var totalCount int
-	err := db.Raw(countQuery).Row().Scan(&totalCount)
+	err = db.Raw(countQuery).Row().Scan(&totalCount)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -107,7 +103,7 @@ func IndexFilesAfi(w http.ResponseWriter, r *http.Request) {
 	query += fmt.Sprintf(" LIMIT %d OFFSET %d", pageLength, offset)
 
 	// Eksekusi query
-	rows, err := db.Raw(query).Rows()
+	rows, err = db.Raw(query).Rows()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -141,6 +137,14 @@ func IndexFilesAfi(w http.ResponseWriter, r *http.Request) {
 		}
 
 		files = append(files, file)
+	}	// Cek apakah data files kosong
+	if len(files) == 0 {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data fileread",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
 	}
 
 	// Siapkan data untuk ditampilkan dalam format JSON

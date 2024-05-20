@@ -14,7 +14,6 @@ import (
 
 func IndexClaim(w http.ResponseWriter, r *http.Request) {
 	// Mendapatkan nilai dari URL query parameters
-	app := "afi"
 	appChild := r.URL.Query().Get("app_child")
 	lengthStr := r.URL.Query().Get("length")
 	yearmonthStr := r.URL.Query().Get("yearmonth")
@@ -26,16 +25,13 @@ func IndexClaim(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("pagination = ", length)
 	yearmonth, _ := strconv.Atoi(yearmonthStr)
 
-	// Koneksi ke database
-	db := models.DBConnections[app]
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
+// Koneksi ke database
+models.ConnectDatabase()
+db := models.DB
 
 	// Query untuk mendapatkan periode
 	var query string
-	query = fmt.Sprintf("SELECT * FROM dashboard.sp_filter('admin', 'production|period', '%s');", app)
+	query = "SELECT * FROM dashboard.sp_filter('admin', 'production|period', 'afi');"
 	fmt.Println(query)
 
 	var periods []models.Period
@@ -159,17 +155,24 @@ func IndexClaim(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var claim models.ClaimListData
 		// Pindai nilai kolom ke dalam variabel struktur
-		switch app {
-		case "afi":
 			if err := rows.Scan(&claim.ClaimId, &claim.LoanId, &claim.ContractNumber, &claim.NominalOutstanding, &claim.Dpd, &claim.FundingPartner, &claim.Product, &claim.Tenor, &claim.PremiumAmount, &claim.Status, &claim.Remark, &claim.Yearmonth, &claim.BatchPolicy, &claim.LoanId, &claim.CreatedAt); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
-			}
+			
 		}
 		claims = append(claims, claim)
 	}
 
 	// Siapkan data untuk ditampilkan dalam format JSON
+	// Cek apakah data files kosong
+	if len(claims) == 0 {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data claim",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
+	}
 	// Kirim respons JSON
 	helper.ResponseJSON(w, http.StatusOK, map[string]interface{}{
 		"items":       claims,

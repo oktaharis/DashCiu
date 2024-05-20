@@ -23,7 +23,6 @@ func UploadFlexi(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Mendapatkan nilai dari body request
-	app := "flexi"
 	uploadInput := r.URL.Query()
 	yearmonthStr := uploadInput.Get("yearmonth")
 	typeFlexi := uploadInput.Get("type")
@@ -31,12 +30,8 @@ func UploadFlexi(w http.ResponseWriter, r *http.Request) {
 	yearmonth, _ := strconv.Atoi(yearmonthStr)
 
 	// Koneksi ke database
-	db := models.DBConnections[app]
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
-
+models.ConnectDatabase()
+db := models.DB
 	// Query untuk mendapatkan periode
 	query := "SELECT * FROM dashboard.sp_filter('admin', 'production|period');"
 	fmt.Println(query)
@@ -165,6 +160,14 @@ func UploadFlexi(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Siapkan data untuk ditampilkan dalam format JSON
+	if len(uploads) == 0 {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data upload",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
+	}
 	// Kirim respons JSON
 	helper.ResponseJSON(w, http.StatusOK, map[string]interface{}{
 		"items":       uploads,

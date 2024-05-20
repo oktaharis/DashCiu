@@ -23,7 +23,6 @@ func SubrogationFlexi(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Mendapatkan nilai dari body request
-	app := "flexi"
 	SubrogationFlexi := r.URL.Query()
 	yearmonthStr := SubrogationFlexi.Get("yearmonth")
 	search := SubrogationFlexi.Get("search")
@@ -32,11 +31,8 @@ func SubrogationFlexi(w http.ResponseWriter, r *http.Request) {
 	yearmonth, _ := strconv.Atoi(yearmonthStr)
 
 	// Koneksi ke database
-	db := models.DBConnections[app]
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
+	models.ConnectDatabase()
+	db := models.DB
 
 	// Query untuk mendapatkan periode
 	query := "SELECT * FROM dashboard.sp_filter('admin', 'production|period');"
@@ -163,6 +159,14 @@ func SubrogationFlexi(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Siapkan data untuk ditampilkan dalam format JSON
+	if len(subrogations) == 0 {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data subgrogation",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
+	}
 	// Kirim respons JSON
 	helper.ResponseJSON(w, http.StatusOK, map[string]interface{}{
 		"items":       subrogations,

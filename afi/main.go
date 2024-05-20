@@ -21,14 +21,14 @@ func main() {
 	r := mux.NewRouter()
 
 	// Menggunakan variabel app dalam URL dan membiarkan page sebagai query parameter
-	models.ConnectDatabase("afi")
+	models.ConnectDatabase()
 	r.HandleFunc("/dashboardafi", dashboardafi.IndexDashAfi).Methods("GET")
 	r.HandleFunc("/managepolicyafi", managepolicyafi.IndexPolicyAfi).Methods("GET")
 	r.HandleFunc("/manageclaimafi", manageclaimafi.IndexClaim).Methods("GET")
 	r.HandleFunc("/fileredinesafi", filereadinessafi.IndexFilesAfi).Methods("GET")
 
 	// ini period
-	r.HandleFunc("/claimafi/period", claimperiodafi.ClaimPeriodAfi).Methods("GET")
+	r.HandleFunc("/manageclaimafi/period", claimperiodafi.ClaimPeriodAfi).Methods("GET")
 	r.HandleFunc("/dashboardafi/period", dashboardperiodafi.DashboardPeriodAfi).Methods("GET")
 	r.HandleFunc("/managepolicyafi/period", policyperiodafi.PolicyPeriodAfi).Methods("GET")
 

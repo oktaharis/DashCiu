@@ -23,18 +23,14 @@ func FilesFlexi(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Mendapatkan nilai dari body request
-	app := "flexi"
 	filesInput := r.URL.Query()
 	yearmonthStr := filesInput.Get("yearmonth")
 
 	yearmonth, _ := strconv.Atoi(yearmonthStr)
 
 	// Koneksi ke database
-	db := models.DBConnections[app]
-	if db == nil {
-		models.ConnectDatabase(app)
-		db = models.DBConnections[app]
-	}
+	models.ConnectDatabase()
+	db := models.DB
 
 	// Query untuk mendapatkan periode
 	query := "SELECT * FROM dashboard.sp_filter('admin', 'production|period');"
@@ -141,6 +137,14 @@ func FilesFlexi(w http.ResponseWriter, r *http.Request) {
 			file.Yearmonth = convertYearmonth(file.Yearmonth)
 
 		files = append(files, file)
+	}
+	if len(files) == 0 {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data fileread",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
 	}
 
 	// Siapkan data untuk ditampilkan dalam format JSON

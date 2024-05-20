@@ -92,6 +92,14 @@ func IndexMonuser(w http.ResponseWriter, r *http.Request) {
 	for i := range data {
 		data[i].DateTimeStr = data[i].DateTime.Format(layout)
 	}
+	if len(data) == 0 {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data monitoring user",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
+	}
 
 	// Create response
 	response := models.LengthAwarePaginator{

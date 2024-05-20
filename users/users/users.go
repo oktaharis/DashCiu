@@ -122,6 +122,14 @@ func Users(w http.ResponseWriter, r *http.Request) {
 
 		users = append(users, user)
 	}
+	if len(users) == 0 {
+		responseData := map[string]interface{}{
+			"status":  false,
+			"message": "failed, get data users",
+		}
+		helper.ResponseJSON(w, http.StatusInternalServerError, responseData)
+		return
+	}
 
 	// Siapkan data untuk ditampilkan dalam format JSON
 	// Kirim respons JSON
